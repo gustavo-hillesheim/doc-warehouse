@@ -11,8 +11,8 @@ class DocumentDatasourceImpl extends DocumentDatasource {
   @override
   Future<List<DocumentModel>> getDocuments() async {
     try {
-      final queryResult = await database.query("SELECT name, description, filePath, creationTime, "
-          "tags FROM document");
+      final queryResult = await database.query(
+          "SELECT name, description, filePath, creationTime FROM documents");
       return queryResult.data
           .map((json) => DocumentModel.fromJson(json))
           .toList(growable: false);

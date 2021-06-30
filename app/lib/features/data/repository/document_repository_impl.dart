@@ -13,9 +13,10 @@ class DocumentRepositoryImpl extends DocumentRepository {
   @override
   Future<Either<Failure, List<Document>>> getDocuments() async {
     try {
-      return Right(await datasource.getDocuments());
-    } on ServerException {
-      return Left(ServerFailure());
+      final result = await datasource.getDocuments();
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
     }
   }
 

@@ -20,29 +20,34 @@ void main() {
   });
 
   test('should execute correct query', () async {
-    when(() => database.query(any())).thenAnswer((_) async => QueryResult([jsonDecode(documentModelJson)]));
+    when(() => database.query(any()))
+        .thenAnswer((_) async => QueryResult([jsonDecode(documentModelJson)]));
 
     final result = await datasource.getDocuments();
 
-    expect(result, [DocumentModel(
+    expect(result, [
+      DocumentModel(
         id: 1,
         name: "Document Name",
         filePath: "path/to/doc.txt",
         description: "A simple document",
         creationTime: DateTime(2021, 1, 1),
-    )]);
-    verify(() => database.query("SELECT name, description, filePath, creationTime, tags FROM document")).called(1);
+      )
+    ]);
+    verify(() => database.query(
+            "SELECT name, description, filePath, creationTime FROM documents"))
+        .called(1);
   });
 
   test('should throw DatabaseException on error', () async {
-      when(() => database.query(any())).thenThrow(Exception('lol'));
+    when(() => database.query(any())).thenThrow(Exception('lol'));
 
-      try {
-        await datasource.getDocuments();
-        fail("Should have thrown exception");
-      } on Exception catch (e) {
-        expect(e, isA<DatabaseException>());
-      }
+    try {
+      await datasource.getDocuments();
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
   });
 }
 

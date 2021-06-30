@@ -1,11 +1,21 @@
 import 'package:equatable/equatable.dart';
 
-class ServerException extends Equatable implements Exception {
+abstract class AppException extends Equatable implements Exception {
+
+  String get message;
+}
+
+class ServerException extends Equatable implements AppException {
+
+  final String message;
+
+  ServerException(this.message);
+
   @override
   List<Object?> get props => [];
 }
 
-class DatabaseException extends Equatable implements Exception {
+class DatabaseException extends Equatable implements AppException {
 
   final String message;
   final Exception cause;

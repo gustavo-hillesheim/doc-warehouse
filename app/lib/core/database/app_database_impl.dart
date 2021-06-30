@@ -22,7 +22,7 @@ class _AppDatabaseImpl extends AppDatabase {
 
   @override
   Future<QueryResult<List<Map<String, dynamic>>>> query(String sql) async {
-    final result = await _database!.query(sql);
+    final result = await _database!.rawQuery(sql);
     return QueryResult(result);
   }
 }

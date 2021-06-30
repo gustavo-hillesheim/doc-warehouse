@@ -26,11 +26,11 @@ void main() {
   });
 
   test('should return ServerFailure on exception', () async {
-    when(datasource.getDocuments).thenThrow(ServerException());
+    when(datasource.getDocuments).thenThrow(ServerException('Server error'));
 
     final result = await repository.getDocuments();
 
-    expect(result, Left(ServerFailure()));
+    expect(result, Left(ServerFailure('Server error')));
     verify(datasource.getDocuments).called(1);
   });
 }

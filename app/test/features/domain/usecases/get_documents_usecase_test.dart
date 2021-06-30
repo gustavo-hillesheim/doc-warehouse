@@ -44,6 +44,9 @@ final mockDocuments = [
 ];
 
 class FakeFailure extends Failure {
+
+  final String message = 'fake message';
+
   @override
   List<Object?> get props => [];
 }
