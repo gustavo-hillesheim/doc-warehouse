@@ -21,6 +21,8 @@ dependencies:
   marquee: ^2.2.0
   file_picker: ^3.0.3
   horizontal_blocked_scroll_physics: ^4.0.0
+  enough_media: ^2.0.0
+  mime: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -11,7 +11,7 @@ class CreateDocumentPage extends StatefulWidget {
 }
 
 class _CreateDocumentPageState extends State<CreateDocumentPage> {
-  File? _selectedFile;
+  FileReference? _selectedFile;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
@@ -40,7 +40,7 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
         : null;
     final document = Document(
       name: _nameController.text,
-      filePath: _selectedFile!.path!,
+      filePath: _selectedFile!.path,
       description: description,
       creationTime: DateTime.now(),
     );

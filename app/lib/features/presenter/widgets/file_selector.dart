@@ -1,10 +1,11 @@
+import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FileSelector extends StatefulWidget {
-  final ValueChanged<File> onSelect;
-  final File? initialValue;
+  final ValueChanged<FileReference> onSelect;
+  final FileReference? initialValue;
 
   FileSelector({required this.onSelect, this.initialValue});
 
@@ -13,7 +14,7 @@ class FileSelector extends StatefulWidget {
 }
 
 class _FileSelectorState extends State<FileSelector> {
-  File? _selectedFile;
+  FileReference? _selectedFile;
 
   @override
   void initState() {
@@ -28,16 +29,19 @@ class _FileSelectorState extends State<FileSelector> {
       decoration: ShapeDecoration(
         color: backgroundColor.withOpacity(0.05),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
           side: BorderSide(
             style: BorderStyle.solid,
             color: backgroundColor,
           ),
         ),
       ),
-      child: InkWell(
-        onTap: _selectFile,
-        child: _selectedFile == null ? _noFileText() : _filePreview(),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: InkWell(
+          onTap: _selectFile,
+          child: _selectedFile == null ? _noFileText() : _filePreview(),
+        ),
       ),
     );
   }
@@ -54,9 +58,7 @@ class _FileSelectorState extends State<FileSelector> {
     ),
   );
 
-  Widget _filePreview() => Center(
-    child: Icon(Icons.file_copy_outlined, size: 64),
-  );
+  Widget _filePreview() => FilePreview(_selectedFile!.path);
 
   void _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -66,22 +68,22 @@ class _FileSelectorState extends State<FileSelector> {
   }
 
   void _setSelectedFile(PlatformFile platformFile) {
-    final file = File.fromPlatformFile(platformFile);
+    final file = FileReference.fromPlatformFile(platformFile);
     _selectedFile = file;
     widget.onSelect(file);
   }
 }
 
-class File {
+class FileReference {
   final String name;
-  final String? path;
+  final String path;
 
-  const File({required this.name, required this.path});
+  const FileReference({required this.name, required this.path});
 
-  factory File.fromPlatformFile(PlatformFile platformFile) {
-    return File(
+  factory FileReference.fromPlatformFile(PlatformFile platformFile) {
+    return FileReference(
       name: platformFile.name,
-      path: platformFile.path,
+      path: platformFile.path!,
     );
   }
 }

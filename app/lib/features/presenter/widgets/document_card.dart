@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
+import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
 import 'package:doc_warehouse/features/presenter/widgets/square.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
@@ -16,7 +17,9 @@ class DocumentCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: Stack(children: [
-        Square(),
+        Square(
+          child: FilePreview(document.filePath),
+        ),
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
