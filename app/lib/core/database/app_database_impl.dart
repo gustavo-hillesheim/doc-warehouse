@@ -25,4 +25,10 @@ class _AppDatabaseImpl extends AppDatabase {
     final result = await _database!.rawQuery(sql);
     return QueryResult(result);
   }
+
+  @override
+  Future<InsertResult<int>> insert(String sql, [List<dynamic>? params]) async {
+    final resultId = await _database!.rawInsert(sql, params);
+    return InsertResult(id: resultId);
+  }
 }

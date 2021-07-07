@@ -15,6 +15,22 @@ class Document extends Equatable {
     this.description,
   });
 
+  Document copyWith({
+    int? id,
+    String? name,
+    String? description,
+    String? filePath,
+    DateTime? creationTime,
+  }) {
+    return Document(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      filePath: filePath ?? this.filePath,
+      creationTime: creationTime ?? this.creationTime,
+      description: description ??this.description,
+    );
+  }
+
   @override
   List<Object?> get props => [id, name, description, filePath, creationTime];
 }

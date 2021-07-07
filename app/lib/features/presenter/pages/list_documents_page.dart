@@ -19,11 +19,7 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
   @override
   void initState() {
     super.initState();
-    Modular.get<GetDocumentsUsecase>()(NoParams()).then(
-      (r) => setState(() {
-        result = r;
-      }),
-    );
+    _loadDocuments();
   }
 
   @override
@@ -73,7 +69,16 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
   }
 
   void _add() {
-    Modular.to.pushNamed(Routes.createDocument);
+    Modular.to.pushNamed(Routes.createDocument).then((_) => _loadDocuments());
+  }
+
+  void _loadDocuments() {
+    final usecase = Modular.get<GetDocumentsUsecase>();
+    usecase(NoParams()).then(
+      (r) => setState(() {
+        result = r;
+      }),
+    );
   }
 }
 

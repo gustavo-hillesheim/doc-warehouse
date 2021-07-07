@@ -19,10 +19,17 @@ class AppDatabaseFactory {
 abstract class AppDatabase {
   Future<void> init();
   Future<QueryResult<List<Map<String, dynamic>>>> query(String sql);
+  Future<InsertResult<int>> insert(String sql, [List<dynamic>? params]);
 }
 
 class QueryResult<T> {
   final T data;
 
   QueryResult(this.data);
+}
+
+class InsertResult<T> {
+  final T id;
+
+  InsertResult({required this.id});
 }

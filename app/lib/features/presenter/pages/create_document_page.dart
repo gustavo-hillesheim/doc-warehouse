@@ -1,4 +1,5 @@
 import 'package:doc_warehouse/features/domain/entities/document.dart';
+import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_selector.dart';
 import 'package:doc_warehouse/features/presenter/widgets/page_view_form.dart';
 import 'package:flutter/material.dart';
@@ -33,15 +34,21 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
     );
   }
 
-  void _save() {
-    final description = _descriptionController.text.isNotEmpty ? _descriptionController.text : null;
+  void _save() async {
+    final description = _descriptionController.text.isNotEmpty
+        ? _descriptionController.text
+        : null;
     final document = Document(
-        name: _nameController.text,
-        filePath: _selectedFile!.path!,
-        description: description,
-        creationTime: DateTime.now(),
+      name: _nameController.text,
+      filePath: _selectedFile!.path!,
+      description: description,
+      creationTime: DateTime.now(),
     );
-    Modular.to.pop();
+    final result = await Modular.get<CreateDocumentUsecase>()(document);
+    result.fold(
+      (failure) => print('Failure $failure'),
+      (_) => Modular.to.pop(),
+    );
   }
 
   PageInput _buildFileSelector(VoidCallback onChange) {

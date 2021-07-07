@@ -39,11 +39,40 @@ void main() {
         .called(1);
   });
 
-  test('should throw DatabaseException on error', () async {
+  test('should throw DatabaseException on error on getDocuments', () async {
     when(() => database.query(any())).thenThrow(Exception('lol'));
 
     try {
       await datasource.getDocuments();
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
+
+  test('should execute correct insert SQL', () async {
+    when(() => database.insert(any(), any()))
+        .thenAnswer((_) async => InsertResult(id: 1));
+
+    final result = await datasource.create(mockDocumentModel);
+
+    expect(result, 1);
+    verify(() => database.insert(
+            'INSERT INTO documents '
+            '(name, description, filePath, creationTime) VALUES (?, ?, ?, ?)',
+            [
+              mockDocumentModel.name,
+              mockDocumentModel.description,
+              mockDocumentModel.filePath,
+              mockDocumentModel.creationTime
+            ])).called(1);
+  });
+
+  test('should throw DatabaseException on error on create', () async {
+    when(() => database.insert(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.create(mockDocumentModel);
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());

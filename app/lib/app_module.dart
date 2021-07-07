@@ -2,6 +2,7 @@ import 'package:doc_warehouse/app_guard.dart';
 import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
 import 'package:doc_warehouse/features/data/repository/document_repository_impl.dart';
+import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
 import 'package:doc_warehouse/features/presenter/pages/create_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/list_documents_page.dart';
@@ -14,7 +15,8 @@ class AppModule extends Module {
     AsyncBind((i) => AppDatabaseFactory.getInstance()),
     Bind((i) => DocumentRepositoryImpl(i())),
     Bind((i) => DocumentDatasourceImpl(i())),
-    Bind((i) => GetDocumentsUsecase(i())),
+    Bind((i) => GetDocumentsUsecase(i()), isSingleton: false),
+    Bind((i) => CreateDocumentUsecase(i()), isSingleton: false),
   ];
 
   @override

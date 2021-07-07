@@ -20,4 +20,23 @@ class DocumentDatasourceImpl extends DocumentDatasource {
       throw new DatabaseException("Could not query documents", e);
     }
   }
+
+  @override
+  Future<int> create(DocumentModel model) async {
+    try {
+      final insertResult = await database.insert(
+        "INSERT INTO documents (name, description, "
+        "filePath, creationTime) VALUES (?, ?, ?, ?)",
+        [
+          model.name,
+          model.description,
+          model.filePath,
+          model.creationTime.toIso8601String()
+        ],
+      );
+      return insertResult.id;
+    } on Exception catch (e) {
+      throw new DatabaseException("Could not insert document", e);
+    }
+  }
 }

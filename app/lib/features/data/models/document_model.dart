@@ -15,6 +15,16 @@ class DocumentModel extends Document {
           description: description,
         );
 
+  factory DocumentModel.fromDocument(Document document) {
+    return DocumentModel(
+      name: document.name,
+      description: document.description,
+      filePath: document.filePath,
+      creationTime: document.creationTime,
+      id: document.id,
+    );
+  }
+
   factory DocumentModel.fromJson(Map<String, dynamic> json) {
     return DocumentModel(
       id: json['id'],
