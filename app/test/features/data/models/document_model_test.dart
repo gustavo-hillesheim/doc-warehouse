@@ -20,7 +20,7 @@ void main() {
       creationTime: DateTime(2021, 1, 1),
     );
 
-    final jsonModel = json.decode(documentModelJson);
+    final jsonModel = json.decode(mockDocumentModelJson);
     final result = DocumentModel.fromJson(jsonModel);
 
     expect(result, equals(expectedResult));

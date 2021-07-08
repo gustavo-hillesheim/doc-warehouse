@@ -39,4 +39,18 @@ class DocumentDatasourceImpl extends DocumentDatasource {
       throw new DatabaseException("Could not insert document", e);
     }
   }
+
+  @override
+  Future<DocumentModel> getDocument(int id) async {
+    try {
+      final queryResult = await database.query("SELECT name, description, filePath, creationTime "
+          "FROM documents WHERE id = ?", [id]);
+      if (queryResult.data.isEmpty) {
+        throw new DatabaseException("Could not find document with id $id");
+      }
+      return DocumentModel.fromJson(queryResult.data.first);
+    } on Exception catch (e) {
+      throw new DatabaseException("Could not query document with id $id", e);
+    }
+  }
 }

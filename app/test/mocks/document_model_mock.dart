@@ -1,7 +1,7 @@
 import 'package:doc_warehouse/features/data/models/document_model.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 
-const documentModelJson = '''
+const mockDocumentModelJson = '''
 {
   "id": 1,
   "name": "Document Name",
@@ -10,6 +10,14 @@ const documentModelJson = '''
   "creationTime": "2021-01-01 00:00:00.000"
 }
 ''';
+
+final mockDocumentModelJsonInstance = DocumentModel(
+  id: 1,
+  name: "Document Name",
+  filePath: "path/to/doc.txt",
+  description: "A simple document",
+  creationTime: DateTime(2021, 1, 1),
+);
 
 final mockDocumentsModel = [
   DocumentModel(

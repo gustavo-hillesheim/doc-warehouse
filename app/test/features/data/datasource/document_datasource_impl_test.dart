@@ -4,7 +4,6 @@ import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/errors/exceptions.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
-import 'package:doc_warehouse/features/data/models/document_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -19,21 +18,13 @@ void main() {
     datasource = DocumentDatasourceImpl(database);
   });
 
-  test('should execute correct query', () async {
-    when(() => database.query(any()))
-        .thenAnswer((_) async => QueryResult([jsonDecode(documentModelJson)]));
+  test('should execute correct query on getDocuments', () async {
+    when(() => database.query(any())).thenAnswer(
+        (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
 
     final result = await datasource.getDocuments();
 
-    expect(result, [
-      DocumentModel(
-        id: 1,
-        name: "Document Name",
-        filePath: "path/to/doc.txt",
-        description: "A simple document",
-        creationTime: DateTime(2021, 1, 1),
-      )
-    ]);
+    expect(result, [mockDocumentModelJsonInstance]);
     verify(() => database.query(
             "SELECT name, description, filePath, creationTime FROM documents"))
         .called(1);
@@ -64,7 +55,7 @@ void main() {
               mockDocumentModel.name,
               mockDocumentModel.description,
               mockDocumentModel.filePath,
-              mockDocumentModel.creationTime
+              mockDocumentModel.creationTime.toIso8601String()
             ])).called(1);
   });
 
@@ -73,6 +64,29 @@ void main() {
 
     try {
       await datasource.create(mockDocumentModel);
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
+
+  test('should execute correct query on getDocument', () async {
+    when(() => database.query(any(), any())).thenAnswer(
+        (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
+
+    final result = await datasource.getDocument(1);
+
+    expect(result, mockDocumentModelJsonInstance);
+    verify(() => database.query(
+        "SELECT name, description, filePath, creationTime FROM documents WHERE id = ?",
+        [1])).called(1);
+  });
+
+  test('should throw DatabaseException on error on getDocument', () async {
+    when(() => database.query(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.getDocument(1);
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());

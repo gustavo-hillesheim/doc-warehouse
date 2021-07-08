@@ -33,4 +33,13 @@ class DocumentRepositoryImpl extends DocumentRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Document>> getDocument(int id) async {
+    try {
+      final document = await datasource.getDocument(id);
+      return Right(document);
+    } on DatabaseException catch(e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
 }

@@ -18,7 +18,7 @@ class AppDatabaseFactory {
 
 abstract class AppDatabase {
   Future<void> init();
-  Future<QueryResult<List<Map<String, dynamic>>>> query(String sql);
+  Future<QueryResult<List<Map<String, dynamic>>>> query(String sql, [List<dynamic>? params]);
   Future<InsertResult<int>> insert(String sql, [List<dynamic>? params]);
 }
 

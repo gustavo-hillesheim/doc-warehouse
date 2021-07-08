@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/errors/exceptions.dart';
 import 'package:doc_warehouse/core/errors/failure.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource.dart';
@@ -52,6 +53,24 @@ void main() {
 
     expect(result, Left(DatabaseFailure('Database error')));
     verify(() => datasource.create(mockDocumentModel)).called(1);
+  });
+
+  test('should get Document, call datasource and return new Document', () async {
+    when(() => datasource.getDocument(1)).thenAnswer((_) async => mockDocumentModelWithId);
+
+    final result = await repository.getDocument(1);
+
+    expect(result, Right(mockDocumentModelWithId));
+    verify(() => datasource.getDocument(1)).called(1);
+  });
+
+  test('should return DatabaseFailure on exception on create', () async {
+    when(() => datasource.getDocument(1)).thenThrow(DatabaseException('Database error'));
+
+    final result = await repository.getDocument(1);
+
+    expect(result, Left(DatabaseFailure('Database error')));
+    verify(() => datasource.getDocument(1)).called(1);
   });
 }
 

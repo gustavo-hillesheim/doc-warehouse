@@ -6,5 +6,6 @@ import 'package:doc_warehouse/features/domain/entities/document.dart';
 
 abstract class DocumentRepository {
   Future<Either<Failure, List<Document>>> getDocuments();
+  Future<Either<Failure, Document>> getDocument(int id);
   Future<Either<Failure, Document>> create(Document document);
 }
