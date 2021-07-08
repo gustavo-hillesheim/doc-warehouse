@@ -69,8 +69,10 @@ class _FileSelectorState extends State<FileSelector> {
 
   void _setSelectedFile(PlatformFile platformFile) {
     final file = FileReference.fromPlatformFile(platformFile);
-    _selectedFile = file;
     widget.onSelect(file);
+    setState(() {
+      _selectedFile = file;
+    });
   }
 }
 
