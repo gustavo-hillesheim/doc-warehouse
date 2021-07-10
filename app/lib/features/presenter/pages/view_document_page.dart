@@ -110,7 +110,7 @@ class _DocumentData extends StatelessWidget {
             ? Text(document.description!)
             : Text(
           'Sem descrição',
-          style: TextStyle(color: Colors.grey.shade800),
+          style: TextStyle(color: Colors.grey.shade700),
         ),
       ],
     );

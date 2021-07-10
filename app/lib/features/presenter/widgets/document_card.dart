@@ -55,11 +55,6 @@ class DocumentCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                Text(
-                  dateFormatter.formatDDMMYYYY(document.creationTime),
-                  style: titleStyle,
-                ),
               ],
             ),
           ),

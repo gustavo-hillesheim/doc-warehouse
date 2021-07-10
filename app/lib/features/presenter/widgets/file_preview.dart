@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:doc_warehouse/core/utils/file_data_loader.dart';
 import 'package:enough_media/enough_media.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -16,8 +15,9 @@ class FilePreview extends StatefulWidget {
 }
 
 class _FilePreviewState extends State<FilePreview> {
-  bool _isLoading = false;
+  final _fileDataLoader = Modular.get<FileDataLoader>();
   FileData? _data;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -58,7 +58,7 @@ class _FilePreviewState extends State<FilePreview> {
     setState(() {
       _isLoading = true;
     });
-    final data = await Modular.get<FileDataLoader>().loadFromPath(path);
+    final data = await _fileDataLoader.loadFromPath(path);
     setState(() {
       _data = data;
       _isLoading = false;
@@ -90,10 +90,15 @@ class _ErrorIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Tooltip(
-        message: 'Não foi possível carregar a visualização do arquivo',
-        child: Icon(icon, size: 64),
+
+    return Tooltip(
+      message: 'Não foi possível carregar a visualização do arquivo',
+      child: Center(
+        child: LayoutBuilder(builder: (_, bounds) {
+          final maxSize = 64.0;
+          final iconSize = bounds.maxWidth / 3 > maxSize ? maxSize : bounds.maxWidth / 3;
+          return Icon(icon, size: iconSize);
+        }),
       ),
     );
   }

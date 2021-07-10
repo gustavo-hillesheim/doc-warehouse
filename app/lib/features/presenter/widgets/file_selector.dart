@@ -47,16 +47,16 @@ class _FileSelectorState extends State<FileSelector> {
   }
 
   Widget _noFileText() => Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Center(
-      child: Text(
-        'Procurar Arquivo',
-        softWrap: true,
-        style: TextStyle(fontSize: 24),
-        textAlign: TextAlign.center,
-      ),
-    ),
-  );
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text(
+            'Procurar Arquivo',
+            softWrap: true,
+            style: TextStyle(fontSize: 24),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
 
   Widget _filePreview() => FilePreview(path: _selectedFile!.path);
 
