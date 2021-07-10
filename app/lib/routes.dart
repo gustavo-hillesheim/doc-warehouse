@@ -6,4 +6,5 @@ class Routes {
 
   static final listDocuments = Modular.initialRoute;
   static final createDocument = '/createDocument';
+  static final viewDocument = '/viewDocument';
 }

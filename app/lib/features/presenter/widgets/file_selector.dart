@@ -58,7 +58,7 @@ class _FileSelectorState extends State<FileSelector> {
     ),
   );
 
-  Widget _filePreview() => FilePreview(_selectedFile!.path);
+  Widget _filePreview() => FilePreview(path: _selectedFile!.path);
 
   void _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();

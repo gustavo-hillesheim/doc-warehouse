@@ -92,17 +92,27 @@ class DocumentsGrid extends StatelessWidget {
     return GridView.builder(
       padding: EdgeInsets.all(4),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, childAspectRatio: 1),
-      itemBuilder: (context, index) => Padding(
-        padding: EdgeInsets.all(4),
-        child: Stack(children: [
-          DocumentCard(documents.elementAt(index)),
-          Material(
-            color: Colors.transparent,
-            child: InkWell(onTap: () => print('navigating to view document')),
-          ),
-        ]),
+        crossAxisCount: MediaQuery.of(context).size.width ~/ 120,
+        childAspectRatio: 1,
       ),
+      itemBuilder: (context, index) {
+        final document = documents.elementAt(index);
+        return Padding(
+          padding: EdgeInsets.all(4),
+          child: Stack(children: [
+            DocumentCard(document),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Modular.to.pushNamed(
+                  Routes.viewDocument,
+                  arguments: document,
+                ),
+              ),
+            ),
+          ]),
+        );
+      },
       itemCount: documents.length,
     );
   }

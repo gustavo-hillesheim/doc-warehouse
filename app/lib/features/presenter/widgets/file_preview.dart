@@ -1,24 +1,23 @@
-import 'dart:io';
-import 'dart:typed_data';
+import 'dart:async';
 
+import 'package:doc_warehouse/core/utils/file_data_loader.dart';
 import 'package:enough_media/enough_media.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mime/mime.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 class FilePreview extends StatefulWidget {
   final String path;
 
-  FilePreview(this.path);
+  FilePreview({required this.path});
 
   @override
   _FilePreviewState createState() => _FilePreviewState();
 }
 
 class _FilePreviewState extends State<FilePreview> {
-  File? _file;
-  Uint8List? _fileData;
-  String? _fileMimeType;
-  bool _fileExists = false;
+  bool _isLoading = false;
+  FileData? _data;
 
   @override
   void initState() {
@@ -27,7 +26,7 @@ class _FilePreviewState extends State<FilePreview> {
   }
 
   @override
-  void didUpdateWidget(FilePreview oldWidget) {
+  void didUpdateWidget(covariant FilePreview oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.path != widget.path) {
       _loadFile(widget.path);
@@ -38,28 +37,41 @@ class _FilePreviewState extends State<FilePreview> {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).primaryColorLight,
-      child: _fileExists
-          ? _canRenderPreview()
-              ? _preview()
-              : _errorOnLoad()
-          : Center(child: CircularProgressIndicator()),
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : (_data != null ? _preview(_data!) : _ErrorIndicator()),
     );
   }
 
-  Widget _preview() => LayoutBuilder(
-        builder: (_, bounds) => PreviewMediaWidget(
-          width: bounds.maxWidth,
-          height: bounds.maxHeight,
-          mediaProvider: MemoryMediaProvider(
-            _file!.path,
-            _fileMimeType!,
-            _fileData!,
-          ),
-          fallbackBuilder: _fallbackPreviewBuilder,
+  Widget _preview(FileData data) => PreviewMediaWidget(
+        useHeroAnimation: true,
+        mediaProvider: MemoryMediaProvider(
+          data.file.path,
+          data.mimeType,
+          data.data,
         ),
+        fallbackBuilder: (_, provider) =>
+            _ErrorIndicator.fromMediaProvider(provider),
       );
 
-  Widget _fallbackPreviewBuilder(BuildContext context, MediaProvider provider) {
+  Future<void> _loadFile(String path) async {
+    setState(() {
+      _isLoading = true;
+    });
+    final data = await Modular.get<FileDataLoader>().loadFromPath(path);
+    setState(() {
+      _data = data;
+      _isLoading = false;
+    });
+  }
+}
+
+class _ErrorIndicator extends StatelessWidget {
+  final IconData icon;
+
+  _ErrorIndicator([this.icon = Icons.error_outline]);
+
+  factory _ErrorIndicator.fromMediaProvider(MediaProvider provider) {
     IconData icon = Icons.error_outline;
     if (provider.isAudio) {
       icon = Icons.audiotrack_outlined;
@@ -73,40 +85,16 @@ class _FilePreviewState extends State<FilePreview> {
     if (provider.isApplication) {
       icon = Icons.picture_as_pdf_outlined;
     }
+    return _ErrorIndicator(icon);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Center(
       child: Tooltip(
         message: 'Não foi possível carregar a visualização do arquivo',
         child: Icon(icon, size: 64),
       ),
     );
-  }
-
-  Widget _errorOnLoad() => Center(
-    child: Tooltip(
-      message: 'Não foi possível carregar a visualização do '
-          'arquivo',
-      child: Icon(Icons.error_outline, size: 64),
-    ),
-  );
-
-  Future<void> _loadFile(String filePath) async {
-    _file = File(widget.path);
-    _fileExists = await _file!.exists();
-    if (_fileExists) {
-      await _loadFileData(_file!);
-    }
-    setState(() {});
-  }
-
-  Future<void> _loadFileData(File file) async {
-    _fileData = await file.readAsBytes();
-    _fileMimeType = lookupMimeType(file.path);
-  }
-
-  bool _canRenderPreview() {
-    return _fileExists &&
-        _file != null &&
-        _fileMimeType != null &&
-        _fileData != null;
   }
 }

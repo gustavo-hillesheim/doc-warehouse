@@ -87,7 +87,6 @@ class _PageViewFormState extends State<PageViewForm> {
       );
 
   Widget _pageBuilder(BuildContext context, int pageIndex) {
-    print('building');
     _currentPage =
         widget.pages.elementAt(pageIndex)(context, _updateMovementRestrictions);
     WidgetsBinding.instance!
