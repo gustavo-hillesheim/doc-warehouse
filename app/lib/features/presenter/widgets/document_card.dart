@@ -1,10 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
 import 'package:doc_warehouse/features/presenter/widgets/square.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_modular/flutter_modular.dart';
 import 'package:marquee/marquee.dart';
 
 const titleStyle = TextStyle(fontSize: 14);
@@ -16,8 +14,6 @@ class DocumentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatter = Modular.get<DateFormatter>();
-
     return Card(
       margin: EdgeInsets.zero,
       child: Stack(children: [
