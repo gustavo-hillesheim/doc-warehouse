@@ -18,21 +18,21 @@ void main() {
   });
 
   test('should return list of documents', () async {
-    when(repository.getDocuments).thenAnswer((_) async => Right(mockDocuments));
+    when(repository.getAll).thenAnswer((_) async => Right(mockDocuments));
 
     final result = await usecase(NoParams());
 
     expect(result, equals(Right(mockDocuments)));
-    verify(repository.getDocuments).called(1);
+    verify(repository.getAll).called(1);
   });
 
   test('should return Failure on error', () async {
-    when(repository.getDocuments).thenAnswer((_) async => Left(FakeFailure()));
+    when(repository.getAll).thenAnswer((_) async => Left(FakeFailure()));
 
     final result = await usecase(NoParams());
 
     expect(result, Left(FakeFailure()));
-    verify(repository.getDocuments).called(1);
+    verify(repository.getAll).called(1);
   });
 }
 

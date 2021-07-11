@@ -11,7 +11,7 @@ class GetDocumentsUsecase extends Usecase<NoParams, List<Document>> {
 
   @override
   Future<Either<Failure, List<Document>>> call(NoParams input) {
-    return repository.getDocuments();
+    return repository.getAll();
   }
 
 }

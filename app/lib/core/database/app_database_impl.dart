@@ -10,11 +10,11 @@ class _AppDatabaseImpl extends AppDatabase {
       version: 1,
       onCreate: (db, _) async {
         await db.execute('CREATE TABLE documents ('
-            'id INTEGER PRIMARY KEY AUTOINCREMENT, '
-            'name VARCHAR(256), '
+            'id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, '
+            'name VARCHAR(256) NOT NULL, '
             'description TEXT, '
-            'filePath VARCHAR(512), '
-            'creationTime DATETIME)');
+            'filePath VARCHAR(512) NOT NULL, '
+            'creationTime DATETIME NOT NULL)');
       },
     );
   }
@@ -29,5 +29,10 @@ class _AppDatabaseImpl extends AppDatabase {
   Future<InsertResult<int>> insert(String sql, [List<dynamic>? params]) async {
     final resultId = await _database!.rawInsert(sql, params);
     return InsertResult(id: resultId);
+  }
+
+  @override
+  Future<void> delete(String sql, [List<dynamic>? params]) async {
+    await _database!.rawDelete(sql, params);
   }
 }

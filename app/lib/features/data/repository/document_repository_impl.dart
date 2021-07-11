@@ -12,9 +12,9 @@ class DocumentRepositoryImpl extends DocumentRepository {
   DocumentRepositoryImpl(this.datasource);
 
   @override
-  Future<Either<Failure, List<Document>>> getDocuments() async {
+  Future<Either<Failure, List<Document>>> getAll() async {
     try {
-      final result = await datasource.getDocuments();
+      final result = await datasource.getAll();
       return Right(result);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
@@ -34,10 +34,20 @@ class DocumentRepositoryImpl extends DocumentRepository {
   }
 
   @override
-  Future<Either<Failure, Document>> getDocument(int id) async {
+  Future<Either<Failure, Document>> getById(int id) async {
     try {
-      final document = await datasource.getDocument(id);
+      final document = await datasource.getById(id);
       return Right(document);
+    } on DatabaseException catch(e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteById(int id) async {
+    try {
+      await datasource.deleteById(id);
+      return Right(null);
     } on DatabaseException catch(e) {
       return Left(DatabaseFailure(e.message));
     }

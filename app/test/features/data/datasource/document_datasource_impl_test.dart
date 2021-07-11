@@ -18,23 +18,23 @@ void main() {
     datasource = DocumentDatasourceImpl(database);
   });
 
-  test('should execute correct query on getDocuments', () async {
+  test('should execute correct query on getAll', () async {
     when(() => database.query(any())).thenAnswer(
         (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
 
-    final result = await datasource.getDocuments();
+    final result = await datasource.getAll();
 
     expect(result, [mockDocumentModelJsonInstance]);
     verify(() => database.query(
-            "SELECT name, description, filePath, creationTime FROM documents"))
+            "SELECT id, name, description, filePath, creationTime FROM documents"))
         .called(1);
   });
 
-  test('should throw DatabaseException on error on getDocuments', () async {
+  test('should throw DatabaseException on error on getAll', () async {
     when(() => database.query(any())).thenThrow(Exception('lol'));
 
     try {
-      await datasource.getDocuments();
+      await datasource.getAll();
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());
@@ -70,11 +70,11 @@ void main() {
     }
   });
 
-  test('should execute correct query on getDocument', () async {
+  test('should execute correct query on getById', () async {
     when(() => database.query(any(), any())).thenAnswer(
         (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
 
-    final result = await datasource.getDocument(1);
+    final result = await datasource.getById(1);
 
     expect(result, mockDocumentModelJsonInstance);
     verify(() => database.query(
@@ -82,11 +82,31 @@ void main() {
         [1])).called(1);
   });
 
-  test('should throw DatabaseException on error on getDocument', () async {
+  test('should throw DatabaseException on error on getById', () async {
     when(() => database.query(any(), any())).thenThrow(Exception('lol'));
 
     try {
-      await datasource.getDocument(1);
+      await datasource.getById(1);
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
+
+  test('should execute correct query on deleteById', () async {
+    when(() => database.delete(any(), any())).thenAnswer((_) async {});
+
+    await datasource.deleteById(1);
+
+    verify(() => database.delete("DELETE * FROM documents WHERE id = ?", [1]))
+        .called(1);
+  });
+
+  test('should throw DatabaseException on error on deleteById', () async {
+    when(() => database.delete(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.deleteById(1);
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());

@@ -18,21 +18,21 @@ void main() {
   });
 
   test('should return Document model and acll datasource', () async {
-    when(datasource.getDocuments).thenAnswer((_) async => mockDocumentsModel);
+    when(datasource.getAll).thenAnswer((_) async => mockDocumentsModel);
 
-    final result = await repository.getDocuments();
+    final result = await repository.getAll();
 
     expect(result, Right(mockDocumentsModel));
-    verify(datasource.getDocuments).called(1);
+    verify(datasource.getAll).called(1);
   });
 
   test('should return DatabaseFailure on exception on getDocuments', () async {
-    when(datasource.getDocuments).thenThrow(DatabaseException('Database error'));
+    when(datasource.getAll).thenThrow(DatabaseException('Database error'));
 
-    final result = await repository.getDocuments();
+    final result = await repository.getAll();
 
     expect(result, Left(DatabaseFailure('Database error')));
-    verify(datasource.getDocuments).called(1);
+    verify(datasource.getAll).called(1);
   });
 
   test('should create Document, call datasource and return new Document', () async {
@@ -54,21 +54,39 @@ void main() {
   });
 
   test('should get Document, call datasource and return new Document', () async {
-    when(() => datasource.getDocument(1)).thenAnswer((_) async => mockDocumentModelWithId);
+    when(() => datasource.getById(1)).thenAnswer((_) async => mockDocumentModelWithId);
 
-    final result = await repository.getDocument(1);
+    final result = await repository.getById(1);
 
     expect(result, Right(mockDocumentModelWithId));
-    verify(() => datasource.getDocument(1)).called(1);
+    verify(() => datasource.getById(1)).called(1);
   });
 
   test('should return DatabaseFailure on exception on create', () async {
-    when(() => datasource.getDocument(1)).thenThrow(DatabaseException('Database error'));
+    when(() => datasource.getById(1)).thenThrow(DatabaseException('Database error'));
 
-    final result = await repository.getDocument(1);
+    final result = await repository.getById(1);
 
     expect(result, Left(DatabaseFailure('Database error')));
-    verify(() => datasource.getDocument(1)).called(1);
+    verify(() => datasource.getById(1)).called(1);
+  });
+
+  test('should delete Document with given id', () async {
+    when(() => datasource.deleteById(1)).thenAnswer((_) async {});
+
+    final result = await repository.deleteById(1);
+
+    expect(result, Right(null));
+    verify(() => datasource.deleteById(1)).called(1);
+  });
+
+  test('should return DatabaseFailure on exception on delete', () async {
+    when(() => datasource.deleteById(1)).thenThrow(DatabaseException('Database error'));
+
+    final result = await repository.deleteById(1);
+
+    expect(result, Left(DatabaseFailure('Database error')));
+    verify(() => datasource.deleteById(1)).called(1);
   });
 }
 

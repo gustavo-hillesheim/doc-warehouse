@@ -5,6 +5,16 @@ abstract class Failure extends Equatable {
   String get message;
 }
 
+class BusinessFailure extends Failure {
+
+  final String message;
+
+  BusinessFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 class DatabaseFailure extends Failure {
 
   final String message;

@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart' as dartz;
 import 'package:doc_warehouse/core/errors/failure.dart';
 import 'package:doc_warehouse/core/usecase/usecase.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
+import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
 import 'package:doc_warehouse/features/presenter/widgets/custom_checkbox.dart';
 import 'package:doc_warehouse/features/presenter/widgets/documents_grid.dart';
@@ -113,7 +114,16 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TextButton(
-            onPressed: () {},
+            onPressed: () async {
+              final documents = _gridKey.currentState!.getSelected();
+              for (final document in documents) {
+                final usecase = Modular.get<DeleteDocumentUsecase>();
+                final result = await usecase(document);
+                print(result);
+              }
+              _gridKey.currentState!.unselectAll();
+              _loadDocuments();
+            },
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

@@ -17,21 +17,21 @@ void main() {
   });
 
   test('should call document repository with given id and return document', () async {
-    when(() => repository.getDocument(1)).thenAnswer((_) async => Right(mockDocumentWithId));
+    when(() => repository.getById(1)).thenAnswer((_) async => Right(mockDocumentWithId));
 
     final result = await usecase(1);
 
     expect(result, Right(mockDocumentWithId));
-    verify(() => repository.getDocument(1)).called(1);
+    verify(() => repository.getById(1)).called(1);
   });
 
   test('should return failure on repository error', () async {
-    when(() => repository.getDocument(1)).thenAnswer((_) async => Left(DatabaseFailure('db failure')));
+    when(() => repository.getById(1)).thenAnswer((_) async => Left(DatabaseFailure('db failure')));
 
     final result = await usecase(1);
 
     expect(result, Left(DatabaseFailure('db failure')));
-    verify(() => repository.getDocument(1)).called(1);
+    verify(() => repository.getById(1)).called(1);
   });
 }
 

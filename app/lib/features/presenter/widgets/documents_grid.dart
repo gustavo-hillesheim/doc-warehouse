@@ -95,6 +95,10 @@ class DocumentsGridState extends State<DocumentsGrid> {
     });
   }
 
+  List<Document> getSelected() {
+    return _selectedDocuments.toList(growable: false);
+  }
+
   void _onTap(Document document) {
     if (_mode == DocumentsGridMode.SELECT) {
       _updateSelected(document);
