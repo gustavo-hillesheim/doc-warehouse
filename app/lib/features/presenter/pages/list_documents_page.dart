@@ -82,10 +82,15 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
   Widget _documentsGrid(List<Document> documents) => DocumentsGrid(
         key: _gridKey,
         documents: documents,
-        onTap: (document) => Modular.to.pushNamed(
-          Routes.viewDocument,
-          arguments: document,
-        ),
+        onTap: (document) async {
+          final shouldReload = await Modular.to.pushNamed(
+            Routes.viewDocument,
+            arguments: document,
+          );
+          if (shouldReload == true) {
+            _loadDocuments();
+          }
+        },
         onSelectChange: (_, __) => setState(() {}),
         onModeChange: (newMode) => setState(() {
           _gridMode = newMode;
@@ -118,8 +123,7 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
               final documents = _gridKey.currentState!.getSelected();
               for (final document in documents) {
                 final usecase = Modular.get<DeleteDocumentUseCase>();
-                final result = await usecase(document);
-                print(result);
+                await usecase(document);
               }
               _gridKey.currentState!.unselectAll();
               _loadDocuments();

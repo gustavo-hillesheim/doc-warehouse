@@ -1,5 +1,6 @@
 import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
+import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -56,14 +57,17 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
                       textAlign: TextAlign.end,
                     ),
                   ),
-                )
+                ),
               ],
             ),
             Align(
-              alignment: Alignment.topLeft,
-              child: IconButton(
-                onPressed: () => Modular.to.pop(),
-                icon: Icon(Icons.arrow_back, color: Colors.white),
+              alignment: Alignment.topCenter,
+              child: _IconBar(
+                onBack: () => Modular.to.pop(),
+                onDelete: () async {
+                  await Modular.get<DeleteDocumentUseCase>()(widget.document);
+                  Modular.to.pop(true);
+                },
               ),
             ),
           ],
@@ -146,4 +150,49 @@ class _DocumentData extends StatelessWidget {
       ],
     );
   }
+}
+
+class _IconBar extends StatelessWidget {
+  final VoidCallback onBack;
+  final VoidCallback onDelete;
+
+  const _IconBar({
+    Key? key,
+    required this.onBack,
+    required this.onDelete,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: onBack,
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+        ),
+        Spacer(),
+        PopupMenuButton<VoidCallback>(
+          itemBuilder: (_) => [
+            _menuItem(Icons.delete_outline, 'Remover', onDelete),
+          ],
+          onSelected: (selected) {
+            selected();
+          },
+          icon: Icon(Icons.more_vert_outlined, color: Colors.white),
+        ),
+      ],
+    );
+  }
+
+  PopupMenuItem<VoidCallback> _menuItem(IconData icon, String text, VoidCallback value) =>
+      PopupMenuItem<VoidCallback>(
+        child: Row(
+          children: [
+            Icon(icon),
+            SizedBox(width: 8),
+            Text(text),
+          ],
+        ),
+        value: onDelete,
+      );
 }
