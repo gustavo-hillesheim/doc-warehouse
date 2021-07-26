@@ -4,10 +4,10 @@ import 'package:doc_warehouse/core/usecase/usecase.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/repository/document_repository.dart';
 
-class GetDocumentUsecase extends Usecase<int, Document> {
+class GetDocumentUseCase extends UseCase<int, Document> {
   final DocumentRepository repository;
 
-  GetDocumentUsecase(this.repository);
+  GetDocumentUseCase(this.repository);
 
   @override
   Future<Either<Failure, Document>> call(int id) {

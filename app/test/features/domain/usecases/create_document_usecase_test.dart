@@ -10,11 +10,11 @@ import '../../../mocks/document_model_mock.dart';
 
 void main() {
   late DocumentRepository repository;
-  late CreateDocumentUsecase usecase;
+  late CreateDocumentUseCase usecase;
 
   setUp(() {
     repository = MockDocumentRepository();
-    usecase = CreateDocumentUsecase(repository);
+    usecase = CreateDocumentUseCase(repository);
   });
 
   test('should save document in repository and return created object',

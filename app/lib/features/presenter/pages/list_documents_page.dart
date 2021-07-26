@@ -117,7 +117,7 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
             onPressed: () async {
               final documents = _gridKey.currentState!.getSelected();
               for (final document in documents) {
-                final usecase = Modular.get<DeleteDocumentUsecase>();
+                final usecase = Modular.get<DeleteDocumentUseCase>();
                 final result = await usecase(document);
                 print(result);
               }
@@ -159,7 +159,7 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
   }
 
   void _loadDocuments() {
-    final usecase = Modular.get<GetDocumentsUsecase>();
+    final usecase = Modular.get<GetDocumentsUseCase>();
     usecase(NoParams()).then(
       (r) => setState(() {
         _result = r;

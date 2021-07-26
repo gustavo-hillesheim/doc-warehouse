@@ -9,11 +9,11 @@ import '../../../mocks/document_model_mock.dart';
 
 void main() {
   late DocumentRepository repository;
-  late DeleteDocumentUsecase usecase;
+  late DeleteDocumentUseCase usecase;
 
   setUp(() {
     repository = MockDocumentRepository();
-    usecase = DeleteDocumentUsecase(repository);
+    usecase = DeleteDocumentUseCase(repository);
   });
 
   test('should call repository to delete document', () async {

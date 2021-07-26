@@ -5,14 +5,10 @@ import 'package:sqflite/sqflite.dart';
 part 'app_database_impl.dart';
 
 class AppDatabaseFactory {
-  static AppDatabase? _instance;
-
-  static Future<AppDatabase> getInstance() async {
-    if (_instance == null) {
-      _instance = _AppDatabaseImpl();
-      await _instance!.init();
-    }
-    return _instance!;
+  static Future<AppDatabase> createInstance() async {
+    final appDatabase = _AppDatabaseImpl();
+    await appDatabase.init();
+    return appDatabase;
   }
 }
 

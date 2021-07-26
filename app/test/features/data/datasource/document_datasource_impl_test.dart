@@ -10,12 +10,12 @@ import 'package:mocktail/mocktail.dart';
 import '../../../mocks/document_model_mock.dart';
 
 void main() {
-  late DocumentDatasource datasource;
+  late DocumentDataSource datasource;
   late AppDatabase database;
 
   setUp(() {
     database = MockDatabase();
-    datasource = DocumentDatasourceImpl(database);
+    datasource = DocumentDataSourceImpl(database);
   });
 
   test('should execute correct query on getAll', () async {
@@ -98,7 +98,7 @@ void main() {
 
     await datasource.deleteById(1);
 
-    verify(() => database.delete("DELETE * FROM documents WHERE id = ?", [1]))
+    verify(() => database.delete("DELETE FROM documents WHERE id = ?", [1]))
         .called(1);
   });
 

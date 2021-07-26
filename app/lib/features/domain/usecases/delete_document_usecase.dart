@@ -4,10 +4,10 @@ import 'package:doc_warehouse/core/usecase/usecase.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/repository/document_repository.dart';
 
-class DeleteDocumentUsecase extends Usecase<Document, void> {
+class DeleteDocumentUseCase extends UseCase<Document, void> {
   final DocumentRepository repository;
 
-  DeleteDocumentUsecase(this.repository);
+  DeleteDocumentUseCase(this.repository);
 
   @override
   Future<Either<Failure, void>> call(Document document) {

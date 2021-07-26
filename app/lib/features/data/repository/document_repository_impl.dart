@@ -7,7 +7,7 @@ import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/repository/document_repository.dart';
 
 class DocumentRepositoryImpl extends DocumentRepository {
-  final DocumentDatasource datasource;
+  final DocumentDataSource datasource;
 
   DocumentRepositoryImpl(this.datasource);
 

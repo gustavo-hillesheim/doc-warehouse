@@ -10,7 +10,7 @@ import '../../../mocks/document_model_mock.dart';
 
 void main() {
   late DocumentRepositoryImpl repository;
-  late DocumentDatasource datasource;
+  late DocumentDataSource datasource;
 
   setUp(() {
     datasource = MockDocumentDatasource();
@@ -90,4 +90,4 @@ void main() {
   });
 }
 
-class MockDocumentDatasource extends Mock implements DocumentDatasource {}
+class MockDocumentDatasource extends Mock implements DocumentDataSource {}

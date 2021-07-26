@@ -14,17 +14,35 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
   FileReference? _selectedFile;
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  static final _kInputBorder = UnderlineInputBorder(
+    borderSide: BorderSide(
+      color: Colors.black.withOpacity(0.2),
+      width: 2,
+    ),
+  );
+  static final _kInputDecoration = InputDecoration(
+    alignLabelWithHint: true,
+    focusedBorder: _kInputBorder.copyWith(
+      borderSide: _kInputBorder.borderSide.copyWith(
+        color: Colors.black.withOpacity(0.4),
+      ),
+    ),
+    border: _kInputBorder,
+    focusColor: Colors.black.withOpacity(0.2),
+  );
+
 
   @override
   Widget build(BuildContext context) {
-    return _invertedParentTheme(
-      child: Scaffold(
-        body: SafeArea(
+    return Scaffold(
+      body: DefaultTextStyle(
+      style: TextStyle(color: Theme.of(context).primaryColor),
+      child: SafeArea(
           child: PageViewForm(
             pages: [
-              (_, onChange) => _buildFileSelector(onChange),
-              (_, onChange) => _buildNameInput(onChange),
-              (_, onChange) => _buildDescriptionInput(onChange),
+                  (_, onChange) => _buildFileSelector(onChange),
+                  (_, onChange) => _buildNameInput(onChange),
+                  (_, onChange) => _buildDescriptionInput(onChange),
             ],
             onCancel: Modular.to.pop,
             onSave: _save,
@@ -44,7 +62,7 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
       description: description,
       creationTime: DateTime.now(),
     );
-    final result = await Modular.get<CreateDocumentUsecase>()(document);
+    final result = await Modular.get<CreateDocumentUseCase>()(document);
     result.fold(
       (failure) => print('Failure $failure'),
       (_) => Modular.to.pop(),
@@ -86,6 +104,7 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
       input: TextField(
         controller: _nameController,
         onChanged: (_) => onChange(),
+        showCursor: false,
         decoration: _kInputDecoration.copyWith(labelText: 'Nome'),
       ),
       validator: () => _nameController.text.isNotEmpty,
@@ -103,55 +122,4 @@ class _CreateDocumentPageState extends State<CreateDocumentPage> {
       ),
     );
   }
-
-  Widget _invertedParentTheme({required Widget child}) {
-    final parentTheme = Theme.of(context);
-    final backgroundColor = parentTheme.primaryColor;
-    final primaryColor = parentTheme.backgroundColor;
-    return Theme(
-      data: parentTheme.copyWith(
-        backgroundColor: backgroundColor,
-        scaffoldBackgroundColor: backgroundColor,
-        primaryColor: primaryColor,
-        iconTheme: parentTheme.iconTheme.copyWith(
-          color: primaryColor,
-        ),
-        textTheme: parentTheme.textTheme.merge(
-          TextTheme(
-            subtitle1: TextStyle(color: primaryColor),
-            bodyText2: TextStyle(color: primaryColor),
-          ),
-        ),
-        inputDecorationTheme: parentTheme.inputDecorationTheme.copyWith(
-          labelStyle: parentTheme.inputDecorationTheme.labelStyle?.copyWith(
-                color: primaryColor,
-              ) ??
-              TextStyle(color: primaryColor),
-        ),
-      ),
-      child: DefaultTextStyle(
-        style: DefaultTextStyle.of(context).style.copyWith(
-              color: primaryColor,
-            ),
-        child: child,
-      ),
-    );
-  }
 }
-
-final _kInputDecoration = InputDecoration(
-  alignLabelWithHint: true,
-  focusedBorder: _kInputBorder.copyWith(
-    borderSide: _kInputBorder.borderSide.copyWith(
-      color: Colors.black.withOpacity(0.4),
-    ),
-  ),
-  border: _kInputBorder,
-);
-
-final _kInputBorder = UnderlineInputBorder(
-  borderSide: BorderSide(
-    color: Colors.black.withOpacity(0.2),
-    width: 2,
-  ),
-);

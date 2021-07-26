@@ -3,10 +3,10 @@ import 'package:doc_warehouse/core/errors/exceptions.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource.dart';
 import 'package:doc_warehouse/features/data/models/document_model.dart';
 
-class DocumentDatasourceImpl extends DocumentDatasource {
+class DocumentDataSourceImpl extends DocumentDataSource {
   final AppDatabase database;
 
-  DocumentDatasourceImpl(this.database);
+  DocumentDataSourceImpl(this.database);
 
   @override
   Future<List<DocumentModel>> getAll() async {
@@ -40,7 +40,6 @@ class DocumentDatasourceImpl extends DocumentDatasource {
     }
   }
 
-
   @override
   Future<DocumentModel> getById(int id) async {
     try {
@@ -54,7 +53,6 @@ class DocumentDatasourceImpl extends DocumentDatasource {
       throw new DatabaseException("Could not query document with id $id", e);
     }
   }
-
 
   @override
   Future<void> deleteById(int id) async {

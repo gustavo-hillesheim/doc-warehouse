@@ -9,11 +9,11 @@ import '../../../mocks/document_model_mock.dart';
 
 void main() {
   late DocumentRepository repository;
-  late GetDocumentUsecase usecase;
+  late GetDocumentUseCase usecase;
 
   setUp(() {
     repository = MockDocumentRepository();
-    usecase = GetDocumentUsecase(repository);
+    usecase = GetDocumentUseCase(repository);
   });
 
   test('should call document repository with given id and return document', () async {

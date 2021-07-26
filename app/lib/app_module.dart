@@ -17,13 +17,13 @@ import 'package:flutter_modular/flutter_modular.dart';
 class AppModule extends Module {
   @override
   final List<Bind> binds = [
-    AsyncBind((i) => AppDatabaseFactory.getInstance()),
+    AsyncBind((i) => AppDatabaseFactory.createInstance()),
     Bind((i) => DocumentRepositoryImpl(i())),
-    Bind((i) => DocumentDatasourceImpl(i())),
-    Bind((i) => GetDocumentsUsecase(i()), isSingleton: false),
-    Bind((i) => CreateDocumentUsecase(i()), isSingleton: false),
-    Bind((i) => GetDocumentUsecase(i()), isSingleton: false),
-    Bind((i) => DeleteDocumentUsecase(i()), isSingleton: false),
+    Bind((i) => DocumentDataSourceImpl(i())),
+    Bind((i) => GetDocumentsUseCase(i()), isSingleton: false),
+    Bind((i) => CreateDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => DeleteDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DateFormatter()),
     Bind((i) => FileDataLoader()),
   ];

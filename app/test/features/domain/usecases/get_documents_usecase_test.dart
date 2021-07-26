@@ -9,12 +9,12 @@ import 'package:mocktail/mocktail.dart';
 import '../../../mocks/document_model_mock.dart';
 
 void main() {
-  late GetDocumentsUsecase usecase;
+  late GetDocumentsUseCase usecase;
   late DocumentRepository repository;
 
   setUp(() {
     repository = MockDocumentRepository();
-    usecase = GetDocumentsUsecase(repository);
+    usecase = GetDocumentsUseCase(repository);
   });
 
   test('should return list of documents', () async {
