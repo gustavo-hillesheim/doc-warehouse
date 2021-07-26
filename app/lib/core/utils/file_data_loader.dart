@@ -7,8 +7,19 @@ import 'package:mime/mime.dart';
 class FileDataLoader {
   Map<String, FileData> _cache = Map<String, FileData>();
 
+  bool hasCached(String path) {
+    return _cache.containsKey(path);
+  }
+
+  FileData? getFromCache(String path) {
+    if (!hasCached(path)) {
+      return null;
+    }
+    return _cache[path];
+  }
+
   Future<FileData?> loadFromPath(String path) async {
-    if (!_cache.containsKey(path)) {
+    if (!hasCached(path)) {
       File file = File(path);
       if (file.existsSync()) {
         final data = await compute(_loadFileData, file);

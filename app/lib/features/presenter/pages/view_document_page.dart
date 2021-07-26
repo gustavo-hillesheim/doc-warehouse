@@ -29,7 +29,13 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        _DocumentPreview(widget.document),
+                        GestureDetector(
+                          onTap: _openBiggerPreview,
+                          child: _DocumentPreview(
+                            document: widget.document,
+                            height: MediaQuery.of(context).size.height * .8,
+                          ),
+                        ),
                         Container(
                           width: double.infinity,
                           child: Padding(
@@ -65,13 +71,39 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
       ),
     );
   }
+
+  void _openBiggerPreview() {
+    Modular.to.push(MaterialPageRoute(builder: (_) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        appBar: AppBar(
+          title: Text(widget.document.name),
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            clipBehavior: Clip.none,
+            child: _DocumentPreview(
+              document: widget.document,
+            ),
+          ),
+        ),
+      );
+    }));
+  }
 }
 
 class _DocumentPreview extends StatelessWidget {
-
   final Document document;
+  final double width;
+  final double height;
 
-  const _DocumentPreview(this.document);
+  const _DocumentPreview({
+    required this.document,
+    this.width = double.infinity,
+    this.height = double.infinity,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +112,14 @@ class _DocumentPreview extends StatelessWidget {
         path: document.filePath,
       ),
       constraints: BoxConstraints(
-        minWidth: double.infinity,
-        maxHeight: MediaQuery.of(context).size.height * .8,
+        minWidth: this.width,
+        maxHeight: this.height,
       ),
     );
   }
 }
 
 class _DocumentData extends StatelessWidget {
-
   final Document document;
 
   const _DocumentData(this.document);
@@ -109,9 +140,9 @@ class _DocumentData extends StatelessWidget {
         document.description != null
             ? Text(document.description!)
             : Text(
-          'Sem descrição',
-          style: TextStyle(color: Colors.grey.shade700),
-        ),
+                'Sem descrição',
+                style: TextStyle(color: Colors.grey.shade700),
+              ),
       ],
     );
   }

@@ -35,11 +35,14 @@ class _FilePreviewState extends State<FilePreview> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).primaryColorLight,
-      child: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : (_data != null ? _preview(_data!) : _ErrorIndicator()),
+    return Hero(
+      tag: widget.path,
+      child: Container(
+        color: Theme.of(context).primaryColorLight,
+        child: _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : (_data != null ? _preview(_data!) : _ErrorIndicator()),
+      ),
     );
   }
 
@@ -55,14 +58,18 @@ class _FilePreviewState extends State<FilePreview> {
       );
 
   Future<void> _loadFile(String path) async {
-    setState(() {
-      _isLoading = true;
-    });
-    final data = await _fileDataLoader.loadFromPath(path);
-    setState(() {
-      _data = data;
-      _isLoading = false;
-    });
+    if (_fileDataLoader.hasCached(path)) {
+      _data = _fileDataLoader.getFromCache(path);
+    } else {
+      setState(() {
+        _isLoading = true;
+      });
+      final data = await _fileDataLoader.loadFromPath(path);
+      setState(() {
+        _data = data;
+        _isLoading = false;
+      });
+    }
   }
 }
 
