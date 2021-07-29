@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
 import 'package:doc_warehouse/routes.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -28,73 +31,81 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
   Widget build(BuildContext context) {
     final dateFormatter = Modular.get<DateFormatter>();
 
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        GestureDetector(
-                          onTap: _openBiggerPreview,
-                          child: _DocumentPreview(
-                            document: document,
-                            height: MediaQuery.of(context).size.height * .8,
+    return WillPopScope(
+      onWillPop: () async {
+        _back();
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          GestureDetector(
+                            onTap: _openBiggerPreview,
+                            child: _DocumentPreview(
+                              document: document,
+                              height: MediaQuery.of(context).size.height * .8,
+                            ),
                           ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: _DocumentData(document),
+                          Container(
+                            width: double.infinity,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: _DocumentData(document),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Salvo em ${dateFormatter.formatDDMMYYYY(document.creationTime)}',
-                      textAlign: TextAlign.end,
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Salvo em ${dateFormatter.formatDDMMYYYY(document.creationTime)}',
+                        textAlign: TextAlign.end,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: _IconBar(
-                onBack: () => Modular.to.pop(widget.document != document),
-                onDelete: () async {
-                  await Modular.get<DeleteDocumentUseCase>()(document);
-                  Modular.to.pop(true);
-                },
-                onEdit: () async {
-                  final newDocument = await Modular.to.pushNamed(
-                    Routes.editDocument,
-                    arguments: document,
-                  );
-                  if (newDocument is Document) {
-                    setState(() {
-                      document = newDocument;
-                    });
-                  }
-                },
+                ],
               ),
-            ),
-          ],
+              Align(
+                alignment: Alignment.topCenter,
+                child: _IconBar(
+                  onBack: _back,
+                  onDelete: () async {
+                    await Modular.get<DeleteDocumentUseCase>()(document);
+                    Modular.to.pop(true);
+                  },
+                  onEdit: () async {
+                    final newDocument = await Modular.to.pushNamed(
+                      Routes.editDocument,
+                      arguments: document,
+                    );
+                    if (newDocument is Document) {
+                      setState(() {
+                        document = newDocument;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  void _back() => Modular.to.pop(widget.document != document);
 
   void _openBiggerPreview() {
     Modular.to.push(MaterialPageRoute(builder: (_) {
@@ -186,24 +197,37 @@ class _IconBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(
-          onPressed: onBack,
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-        ),
-        Spacer(),
-        PopupMenuButton<VoidCallback>(
-          itemBuilder: (_) => [
-            _menuItem(Icons.delete_outline, 'Remover', onDelete),
-            _menuItem(Icons.edit_outlined, 'Alterar', onEdit),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).primaryColor.withOpacity(.5),
+            Theme.of(context).primaryColor.withOpacity(.2),
+            Colors.transparent,
           ],
-          onSelected: (selected) {
-            selected();
-          },
-          icon: Icon(Icons.more_vert_outlined, color: Colors.white),
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
-      ],
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: onBack,
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+          ),
+          Spacer(),
+          PopupMenuButton<VoidCallback>(
+            itemBuilder: (_) => [
+              _menuItem(Icons.delete_outline, 'Remover', onDelete),
+              _menuItem(Icons.edit_outlined, 'Alterar', onEdit),
+            ],
+            onSelected: (selected) {
+              selected();
+            },
+            icon: Icon(Icons.more_vert_outlined, color: Colors.white),
+          ),
+        ],
+      ),
     );
   }
 
