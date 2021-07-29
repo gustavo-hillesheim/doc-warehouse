@@ -78,7 +78,7 @@ void main() {
 
     expect(result, mockDocumentModelJsonInstance);
     verify(() => database.query(
-        "SELECT name, description, filePath, creationTime FROM documents WHERE id = ?",
+        "SELECT id, name, description, filePath, creationTime FROM documents WHERE id = ?",
         [1])).called(1);
   });
 
@@ -87,6 +87,38 @@ void main() {
 
     try {
       await datasource.getById(1);
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
+
+  test('should execute correct query on update', () async {
+    final model = mockDocumentModelWithId;
+    when(() => database.update(any(), any())).thenAnswer((_) async => {});
+
+    await datasource.update(model);
+
+    verify(
+      () => database.update(
+          "UPDATE documents "
+          "SET name = ?, description = ?, filePath = ?, creationTime = ? "
+          "WHERE id = ?",
+          [
+            model.name,
+            model.description,
+            model.filePath,
+            model.creationTime.toIso8601String(),
+            model.id
+          ]),
+    ).called(1);
+  });
+
+  test('should throw DatabaseException on error on update', () async {
+    when(() => database.update(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.update(mockDocumentModel);
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());

@@ -6,5 +6,6 @@ abstract class DocumentDataSource {
   Future<List<DocumentModel>> getAll();
   Future<DocumentModel> getById(int id);
   Future<int> create(DocumentModel model);
+  Future<void> update(DocumentModel model);
   Future<void> deleteById(int id);
 }

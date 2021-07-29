@@ -16,6 +16,7 @@ abstract class AppDatabase {
   Future<void> init();
   Future<QueryResult<List<Map<String, dynamic>>>> query(String sql, [List<dynamic>? params]);
   Future<InsertResult<int>> insert(String sql, [List<dynamic>? params]);
+  Future<void> update(String sql, [List<dynamic>? params]);
   Future<void> delete(String sql, [List<dynamic>? params]);
 }
 

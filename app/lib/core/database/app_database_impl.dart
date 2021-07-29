@@ -35,4 +35,9 @@ class _AppDatabaseImpl extends AppDatabase {
   Future<void> delete(String sql, [List<dynamic>? params]) async {
     await _database!.rawDelete(sql, params);
   }
+
+  @override
+  Future<void> update(String sql, [List<dynamic>? params]) async {
+    await _database!.rawUpdate(sql, params);
+  }
 }

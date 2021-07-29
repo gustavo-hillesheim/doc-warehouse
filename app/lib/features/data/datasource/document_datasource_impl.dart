@@ -41,10 +41,32 @@ class DocumentDataSourceImpl extends DocumentDataSource {
   }
 
   @override
+  Future<void> update(DocumentModel model) async {
+    try {
+      await database.update(
+        "UPDATE documents "
+        "SET name = ?, description = ?, filePath = ?, creationTime = ? "
+        "WHERE id = ?",
+        [
+          model.name,
+          model.description,
+          model.filePath,
+          model.creationTime.toIso8601String(),
+          model.id,
+        ],
+      );
+    } on Exception catch (e) {
+      throw new DatabaseException("Could not update document", e);
+    }
+  }
+
+  @override
   Future<DocumentModel> getById(int id) async {
     try {
-      final queryResult = await database.query("SELECT name, description, filePath, creationTime "
-          "FROM documents WHERE id = ?", [id]);
+      final queryResult = await database.query(
+          "SELECT id, name, description, filePath, creationTime "
+          "FROM documents WHERE id = ?",
+          [id]);
       if (queryResult.data.isEmpty) {
         throw new DatabaseException("Could not find document with id $id");
       }

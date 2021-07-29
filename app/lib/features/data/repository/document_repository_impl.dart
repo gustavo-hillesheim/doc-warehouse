@@ -34,6 +34,19 @@ class DocumentRepositoryImpl extends DocumentRepository {
   }
 
   @override
+  Future<Either<Failure, Document>> update(Document document) async {
+    if (document.id == null) {
+      return Left(BusinessFailure("The given document does not have an id"));
+    }
+    try {
+      await datasource.update(DocumentModel.fromDocument(document));
+      return Right(document.copyWith());
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
   Future<Either<Failure, Document>> getById(int id) async {
     try {
       final document = await datasource.getById(id);

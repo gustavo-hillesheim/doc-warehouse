@@ -2,6 +2,7 @@ import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_preview.dart';
+import 'package:doc_warehouse/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -15,6 +16,14 @@ class ViewDocumentPage extends StatefulWidget {
 }
 
 class _ViewDocumentPageState extends State<ViewDocumentPage> {
+  late Document document;
+
+  @override
+  void initState() {
+    super.initState();
+    document = widget.document;
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateFormatter = Modular.get<DateFormatter>();
@@ -33,7 +42,7 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
                         GestureDetector(
                           onTap: _openBiggerPreview,
                           child: _DocumentPreview(
-                            document: widget.document,
+                            document: document,
                             height: MediaQuery.of(context).size.height * .8,
                           ),
                         ),
@@ -41,7 +50,7 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
                           width: double.infinity,
                           child: Padding(
                             padding: const EdgeInsets.all(8),
-                            child: _DocumentData(widget.document),
+                            child: _DocumentData(document),
                           ),
                         ),
                       ],
@@ -53,7 +62,7 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'Salvo em ${dateFormatter.formatDDMMYYYY(widget.document.creationTime)}',
+                      'Salvo em ${dateFormatter.formatDDMMYYYY(document.creationTime)}',
                       textAlign: TextAlign.end,
                     ),
                   ),
@@ -63,10 +72,21 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
             Align(
               alignment: Alignment.topCenter,
               child: _IconBar(
-                onBack: () => Modular.to.pop(),
+                onBack: () => Modular.to.pop(widget.document != document),
                 onDelete: () async {
-                  await Modular.get<DeleteDocumentUseCase>()(widget.document);
+                  await Modular.get<DeleteDocumentUseCase>()(document);
                   Modular.to.pop(true);
+                },
+                onEdit: () async {
+                  final newDocument = await Modular.to.pushNamed(
+                    Routes.editDocument,
+                    arguments: document,
+                  );
+                  if (newDocument is Document) {
+                    setState(() {
+                      document = newDocument;
+                    });
+                  }
                 },
               ),
             ),
@@ -155,11 +175,13 @@ class _DocumentData extends StatelessWidget {
 class _IconBar extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   const _IconBar({
     Key? key,
     required this.onBack,
     required this.onDelete,
+    required this.onEdit,
   }) : super(key: key);
 
   @override
@@ -174,6 +196,7 @@ class _IconBar extends StatelessWidget {
         PopupMenuButton<VoidCallback>(
           itemBuilder: (_) => [
             _menuItem(Icons.delete_outline, 'Remover', onDelete),
+            _menuItem(Icons.edit_outlined, 'Alterar', onEdit),
           ],
           onSelected: (selected) {
             selected();
@@ -184,7 +207,8 @@ class _IconBar extends StatelessWidget {
     );
   }
 
-  PopupMenuItem<VoidCallback> _menuItem(IconData icon, String text, VoidCallback value) =>
+  PopupMenuItem<VoidCallback> _menuItem(
+          IconData icon, String text, VoidCallback value) =>
       PopupMenuItem<VoidCallback>(
         child: Row(
           children: [
@@ -193,6 +217,6 @@ class _IconBar extends StatelessWidget {
             Text(text),
           ],
         ),
-        value: onDelete,
+        value: value,
       );
 }

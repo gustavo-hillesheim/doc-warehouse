@@ -35,7 +35,8 @@ void main() {
     verify(datasource.getAll).called(1);
   });
 
-  test('should create Document, call datasource and return new Document', () async {
+  test('should create Document, call datasource and return new Document',
+      () async {
     when(() => datasource.create(mockDocumentModel)).thenAnswer((_) async => 1);
 
     final result = await repository.create(mockDocument);
@@ -45,7 +46,8 @@ void main() {
   });
 
   test('should return DatabaseFailure on exception on create', () async {
-    when(() => datasource.create(mockDocumentModel)).thenThrow(DatabaseException('Database error'));
+    when(() => datasource.create(mockDocumentModel))
+        .thenThrow(DatabaseException('Database error'));
 
     final result = await repository.create(mockDocument);
 
@@ -53,8 +55,39 @@ void main() {
     verify(() => datasource.create(mockDocumentModel)).called(1);
   });
 
-  test('should get Document, call datasource and return new Document', () async {
-    when(() => datasource.getById(1)).thenAnswer((_) async => mockDocumentModelWithId);
+  test('should update Document, call datasource and return updated Document',
+      () async {
+    when(() => datasource.update(mockDocumentModelWithId))
+        .thenAnswer((_) async {});
+
+    final result = await repository.update(mockDocumentWithId);
+
+    expect(result, Right(mockDocumentWithId));
+    verify(() => datasource.update(mockDocumentModelWithId)).called(1);
+  });
+
+  test('should throw error when updating Document without id', () async {
+    final result = await repository.update(mockDocument);
+
+    expect(result,
+        Left(BusinessFailure('The given document does not have an id')));
+  });
+
+  test(
+      'should throw error when updating Document when datasource returns exception',
+      () async {
+    when(() => datasource.update(mockDocumentModelWithId))
+        .thenThrow(DatabaseException("fake exception"));
+
+    final result = await repository.update(mockDocumentWithId);
+
+    expect(result, Left(DatabaseFailure('fake exception')));
+  });
+
+  test('should get Document, call datasource and return new Document',
+      () async {
+    when(() => datasource.getById(1))
+        .thenAnswer((_) async => mockDocumentModelWithId);
 
     final result = await repository.getById(1);
 
@@ -63,7 +96,8 @@ void main() {
   });
 
   test('should return DatabaseFailure on exception on create', () async {
-    when(() => datasource.getById(1)).thenThrow(DatabaseException('Database error'));
+    when(() => datasource.getById(1))
+        .thenThrow(DatabaseException('Database error'));
 
     final result = await repository.getById(1);
 
@@ -81,7 +115,8 @@ void main() {
   });
 
   test('should return DatabaseFailure on exception on delete', () async {
-    when(() => datasource.deleteById(1)).thenThrow(DatabaseException('Database error'));
+    when(() => datasource.deleteById(1))
+        .thenThrow(DatabaseException('Database error'));
 
     final result = await repository.deleteById(1);
 

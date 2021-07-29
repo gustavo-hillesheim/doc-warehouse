@@ -4,12 +4,15 @@ import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/core/utils/file_data_loader.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
 import 'package:doc_warehouse/features/data/repository/document_repository_impl.dart';
+import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
+import 'package:doc_warehouse/features/domain/usecases/update_document_usecase.dart';
 import 'package:doc_warehouse/features/presenter/pages/create_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/list_documents_page.dart';
+import 'package:doc_warehouse/features/presenter/pages/update_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/view_document_page.dart';
 import 'package:doc_warehouse/routes.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -22,6 +25,7 @@ class AppModule extends Module {
     Bind((i) => DocumentDataSourceImpl(i())),
     Bind((i) => GetDocumentsUseCase(i()), isSingleton: false),
     Bind((i) => CreateDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => UpdateDocumentUseCase(i()), isSingleton: false),
     Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DeleteDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DateFormatter()),
@@ -38,6 +42,17 @@ class AppModule extends Module {
     ChildRoute(
       Routes.createDocument,
       child: (_, __) => CreateDocumentPage(),
+      guards: [AppGuard()],
+    ),
+    ChildRoute(
+      Routes.editDocument,
+      child: (_, route) {
+        print(route.data);
+        if (route.data is Document) {
+          return UpdateDocumentPage(route.data);
+        }
+        throw Exception('The "${Routes.editDocument}" route must receive a document as parameter');
+      },
       guards: [AppGuard()],
     ),
     ChildRoute(

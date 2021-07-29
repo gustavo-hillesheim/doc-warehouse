@@ -10,7 +10,16 @@ class GetDocumentUseCase extends UseCase<int, Document> {
   GetDocumentUseCase(this.repository);
 
   @override
-  Future<Either<Failure, Document>> call(int id) {
-    return repository.getById(id);
+  Future<Either<Failure, Document>> call(int id) async {
+    final result = await repository.getById(id);
+    return result.fold(
+      (failure) => Left(failure),
+      (document) {
+        if (document == null) {
+          return Left(BusinessFailure("Could not find document of id $id"));
+        }
+        return Right(document);
+      },
+    );
   }
 }
