@@ -5,8 +5,6 @@ import 'package:doc_warehouse/features/presenter/widgets/square.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
 
-const titleStyle = TextStyle(fontSize: 14);
-
 class DocumentCard extends StatelessWidget {
   final Document document;
 
@@ -14,6 +12,7 @@ class DocumentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const titleStyle = const TextStyle(fontSize: 14);
     return Card(
       margin: EdgeInsets.zero,
       child: Stack(children: [

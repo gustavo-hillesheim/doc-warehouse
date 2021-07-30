@@ -4,8 +4,9 @@ import 'package:doc_warehouse/core/usecase/usecase.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
-import 'package:doc_warehouse/features/presenter/widgets/custom_checkbox.dart';
 import 'package:doc_warehouse/features/presenter/widgets/documents_grid.dart';
+import 'package:doc_warehouse/features/presenter/widgets/selectable_group/selectable_group.dart';
+import 'package:doc_warehouse/features/presenter/widgets/selectable_group/selectable_group_switch.dart';
 import 'package:doc_warehouse/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
@@ -17,9 +18,6 @@ class ListDocumentsPage extends StatefulWidget {
 
 class _ListDocumentsPageState extends State<ListDocumentsPage> {
   dartz.Either<Failure, List<Document>>? _result;
-  final GlobalKey<DocumentsGridState> _gridKey =
-      GlobalKey<DocumentsGridState>();
-  DocumentsGridMode? _gridMode;
 
   @override
   void initState() {
@@ -29,23 +27,25 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(),
-      body: _result == null
-          ? Center(child: CircularProgressIndicator())
-          : _result!.fold(
-              (failure) => Center(child: Text(failure.message)),
-              (documents) =>
-                  documents.isNotEmpty ? _documentsGrid(documents) : _empty(),
-            ),
-      bottomSheet: _isSelectMode() ? _selectModeMenu() : null,
-      floatingActionButton: _isSelectMode() ? null : _fab(),
+    return SelectableGroup<Document>(
+      builder: (context, isSelectMode) => Scaffold(
+        appBar: _appBar(isSelectMode),
+        body: _result == null
+            ? Center(child: CircularProgressIndicator())
+            : _result!.fold(
+                (failure) => Center(child: Text(failure.message)),
+                (documents) =>
+                    documents.isNotEmpty ? _documentsGrid(documents) : _empty(),
+              ),
+        bottomSheet: isSelectMode ? _selectModeMenu() : null,
+        floatingActionButton: isSelectMode ? null : _fab(),
+      ),
     );
   }
 
-  AppBar _appBar() => AppBar(
-        title: _isSelectMode()
-            ? _selectOrUnselectAllBox()
+  AppBar _appBar(bool isSelectMode) => AppBar(
+        title: isSelectMode
+            ? SelectableGroupSwitch()
             : Text(
                 'Documentos',
                 style: TextStyle(
@@ -56,33 +56,9 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
         shadowColor: Colors.transparent,
       );
 
-  Widget _selectOrUnselectAllBox() => Row(
-        children: [
-          CustomCheckbox(
-            value: _gridKey.currentState!.isAllSelected(),
-            onChange: (newValue) {
-              if (newValue == true) {
-                _gridKey.currentState!.selectAll();
-              } else {
-                _gridKey.currentState!.unselectAll();
-              }
-            },
-          ),
-          SizedBox(width: 8),
-          Text(
-            'Selecionar todos',
-            style: TextStyle(
-              color: Colors.black87,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      );
-
   Widget _documentsGrid(List<Document> documents) => DocumentsGrid(
-        key: _gridKey,
         documents: documents,
-        onTap: (document) async {
+        onTapDocument: (document) async {
           final shouldReload = await Modular.to.pushNamed(
             Routes.viewDocument,
             arguments: document,
@@ -91,10 +67,6 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
             _loadDocuments();
           }
         },
-        onSelectChange: (_, __) => setState(() {}),
-        onModeChange: (newMode) => setState(() {
-          _gridMode = newMode;
-        }),
       );
 
   Widget _empty() => Center(
@@ -115,19 +87,11 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
   Widget _selectModeMenu() => BottomSheet(
     backgroundColor: Colors.white,
     onClosing: () {},
-    builder: (_) => Row(
+    builder: (context) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           TextButton(
-            onPressed: () async {
-              final documents = _gridKey.currentState!.getSelected();
-              for (final document in documents) {
-                final usecase = Modular.get<DeleteDocumentUseCase>();
-                await usecase(document);
-              }
-              _gridKey.currentState!.unselectAll();
-              _loadDocuments();
-            },
+            onPressed: () => _deleteSelected(context),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -156,7 +120,16 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
     );
   }
 
-  bool _isSelectMode() => _gridMode == DocumentsGridMode.SELECT;
+  void _deleteSelected(BuildContext context) async {
+    final selectableGroup = SelectableGroup.of(context)!;
+    final documents = selectableGroup.getAllSelected();
+    for (final document in documents) {
+    final usecase = Modular.get<DeleteDocumentUseCase>();
+    await usecase(document);
+    }
+    selectableGroup.unselectAll();
+    _loadDocuments();
+  }
 
   void _add() {
     Modular.to.pushNamed(Routes.createDocument).then((_) => _loadDocuments());
