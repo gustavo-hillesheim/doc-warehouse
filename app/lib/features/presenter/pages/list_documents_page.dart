@@ -1,28 +1,26 @@
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:doc_warehouse/core/errors/failure.dart';
-import 'package:doc_warehouse/core/usecase/usecase.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
-import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
+import 'package:doc_warehouse/features/presenter/controller/list_documents_store.dart';
 import 'package:doc_warehouse/features/presenter/widgets/documents_grid.dart';
 import 'package:doc_warehouse/features/presenter/widgets/selectable_group/selectable_group.dart';
 import 'package:doc_warehouse/features/presenter/widgets/selectable_group/selectable_group_switch.dart';
 import 'package:doc_warehouse/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:flutter_triple/flutter_triple.dart';
 
 class ListDocumentsPage extends StatefulWidget {
   @override
   _ListDocumentsPageState createState() => _ListDocumentsPageState();
 }
 
-class _ListDocumentsPageState extends State<ListDocumentsPage> {
-  dartz.Either<Failure, List<Document>>? _result;
-
+class _ListDocumentsPageState
+    extends ModularState<ListDocumentsPage, ListDocumentsStore> {
   @override
   void initState() {
     super.initState();
-    _loadDocuments();
+    store.loadDocuments();
   }
 
   @override
@@ -30,13 +28,13 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
     return SelectableGroup<Document>(
       builder: (context, isSelectMode) => Scaffold(
         appBar: _appBar(isSelectMode),
-        body: _result == null
-            ? Center(child: CircularProgressIndicator())
-            : _result!.fold(
-                (failure) => Center(child: Text(failure.message)),
-                (documents) =>
-                    documents.isNotEmpty ? _documentsGrid(documents) : _empty(),
-              ),
+        body: ScopedBuilder<ListDocumentsStore, Failure, List<Document>>(
+          store: store,
+          onError: (_, failure) => Center(child: Text(failure!.message)),
+          onLoading: (_) => Center(child: CircularProgressIndicator()),
+          onState: (_, documents) =>
+              documents.isNotEmpty ? _documentsGrid(documents) : _empty(),
+        ),
         bottomSheet: isSelectMode ? _selectModeMenu() : null,
         floatingActionButton: isSelectMode ? null : _fab(),
       ),
@@ -64,7 +62,7 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
             arguments: document,
           );
           if (shouldReload == true) {
-            _loadDocuments();
+            store.loadDocuments();
           }
         },
       );
@@ -85,38 +83,35 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
       );
 
   Widget _selectModeMenu() => BottomSheet(
-    backgroundColor: Colors.white,
-    onClosing: () {},
-    builder: (context) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          TextButton(
-            onPressed: () => _deleteSelected(context),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.delete_outlined),
-                SizedBox(height: 4),
-                Text('Remover'),
-              ],
+        backgroundColor: Colors.white,
+        onClosing: () {},
+        builder: (context) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () => _deleteSelected(context),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete_outlined),
+                  SizedBox(height: 4),
+                  Text('Remover'),
+                ],
+              ),
             ),
-          ),
-        ],
-    ),
-  );
+          ],
+        ),
+      );
 
-  FloatingActionButton? _fab() {
-    if (_result == null) {
-      return null;
-    }
-    return _result!.fold(
-      (_) => null,
-      (documents) => documents.isNotEmpty
+  Widget _fab() {
+    return ScopedBuilder<ListDocumentsStore, Failure, List<Document>>(
+      store: store,
+      onState: (_, documents) => documents.isNotEmpty
           ? FloatingActionButton(
               onPressed: _add,
               child: Icon(Icons.add),
             )
-          : null,
+          : Container(),
     );
   }
 
@@ -124,23 +119,16 @@ class _ListDocumentsPageState extends State<ListDocumentsPage> {
     final selectableGroup = SelectableGroup.of(context)!;
     final documents = selectableGroup.getAllSelected();
     for (final document in documents) {
-    final usecase = Modular.get<DeleteDocumentUseCase>();
-    await usecase(document);
+      final usecase = Modular.get<DeleteDocumentUseCase>();
+      await usecase(document);
     }
     selectableGroup.unselectAll();
-    _loadDocuments();
+    store.loadDocuments();
   }
 
   void _add() {
-    Modular.to.pushNamed(Routes.createDocument).then((_) => _loadDocuments());
-  }
-
-  void _loadDocuments() {
-    final usecase = Modular.get<GetDocumentsUseCase>();
-    usecase(NoParams()).then(
-      (r) => setState(() {
-        _result = r;
-      }),
-    );
+    Modular.to
+        .pushNamed(Routes.createDocument)
+        .then((_) => store.loadDocuments());
   }
 }
