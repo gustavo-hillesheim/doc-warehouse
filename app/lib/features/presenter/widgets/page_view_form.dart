@@ -24,29 +24,38 @@ class _PageViewFormState extends State<PageViewForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _isFirstPage ? _cancelButton() : _backButton(),
-        Expanded(
-          child: PageView.builder(
-            physics: _isValid ? null : LeftBlockedScrollPhysics(),
-            controller: _controller,
-            onPageChanged: _updateCurrentPage,
-            itemBuilder: _pageBuilder,
-            itemCount: widget.pages.length,
+    return WillPopScope(
+      onWillPop: () async {
+        if (_currentPageIndex > 0) {
+          _back();
+          return false;
+        }
+        return true;
+      },
+      child: Column(
+        children: [
+          _isFirstPage ? _cancelButton() : _backButton(),
+          Expanded(
+            child: PageView.builder(
+              physics: _isValid ? null : LeftBlockedScrollPhysics(),
+              controller: _controller,
+              onPageChanged: _updateCurrentPage,
+              itemBuilder: _pageBuilder,
+              itemCount: widget.pages.length,
+            ),
           ),
-        ),
-        Padding(
-          padding:
-          const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          child: Row(
-            children: [
-              Spacer(),
-              _isLastPage ? _saveButton() : _nextButton(),
-            ],
+          Padding(
+            padding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            child: Row(
+              children: [
+                Spacer(),
+                _isLastPage ? _saveButton() : _nextButton(),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

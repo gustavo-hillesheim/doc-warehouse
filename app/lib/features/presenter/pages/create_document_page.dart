@@ -11,16 +11,18 @@ class CreateDocumentPage extends StatelessWidget {
       body: SafeArea(
         child: DocumentForm(
           onCancel: Modular.to.pop,
-          onSave: _save,
+          onSave: (doc) => _save(doc, context),
         ),
       ),
     );
   }
 
-  void _save(Document document) async {
+  void _save(Document document, BuildContext context) async {
     final result = await Modular.get<CreateDocumentUseCase>()(document);
     result.fold(
-      (failure) => print('Failure $failure'),
+      (failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+        'Não foi possível criar o documento: ${failure.message}'
+      ))),
       (_) => Modular.to.pop(),
     );
   }
