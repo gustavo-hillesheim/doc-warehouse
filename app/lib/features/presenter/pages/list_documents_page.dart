@@ -128,6 +128,7 @@ class _ListDocumentsPageState
         context,
         'Documentos removidos!',
         SnackBarAction(
+          textColor: Colors.blue,
           label: 'Desfazer',
           onPressed: () async {
             final createUsecase = Modular.get<CreateDocumentUseCase>();
