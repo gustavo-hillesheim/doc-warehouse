@@ -16,16 +16,18 @@ class UpdateDocumentPage extends StatelessWidget {
         child: DocumentForm(
           initialValue: document,
           onCancel: Modular.to.pop,
-          onSave: _save,
+          onSave: (doc) => _save(doc, context),
         ),
       ),
     );
   }
 
-  void _save(Document document) async {
+  void _save(Document document, BuildContext context) async {
     final result = await Modular.get<UpdateDocumentUseCase>()(document);
     result.fold(
-          (failure) => print('Failure $failure'),
+          (failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(
+              'Não foi possível atualizar o documento: ${failure.message}'
+          ))),
           (_) => Modular.to.pop(document),
     );
   }
