@@ -1,6 +1,7 @@
 import 'package:doc_warehouse/core/errors/failure.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
-import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
+import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
+import 'package:doc_warehouse/features/domain/usecases/delete_documents_usecase.dart';
 import 'package:doc_warehouse/features/presenter/controller/list_documents_store.dart';
 import 'package:doc_warehouse/features/presenter/widgets/documents_grid.dart';
 import 'package:doc_warehouse/features/presenter/widgets/selectable_group/selectable_group.dart';
@@ -115,15 +116,45 @@ class _ListDocumentsPageState
     );
   }
 
-  void _deleteSelected(BuildContext context) async {
-    final selectableGroup = SelectableGroup.of(context)!;
+  void _deleteSelected(BuildContext selectableGroupContext) async {
+    final selectableGroup = SelectableGroup.of<Document>(selectableGroupContext)!;
     final documents = selectableGroup.getAllSelected();
-    for (final document in documents) {
-      final usecase = Modular.get<DeleteDocumentUseCase>();
-      await usecase(document);
-    }
+    final usecase = Modular.get<DeleteDocumentsUseCase>();
+    final result = await usecase(documents);
+    result.fold(
+      (failure) => _showSnackBar(
+          context, 'Não foi possível remover os documents: ${failure.message}'),
+      (_) => _showSnackBar(
+        context,
+        'Documentos removidos!',
+        SnackBarAction(
+          label: 'Desfazer',
+          onPressed: () async {
+            final createUsecase = Modular.get<CreateDocumentUseCase>();
+            for (final document in documents) {
+              final result = await createUsecase(document);
+              result.fold(
+                  (failure) => _showSnackBar(context,
+                      'Não foi possível recuperar o documento \"${document.name}\": ${failure.message}'),
+                  (_) {});
+            }
+            store.loadDocuments();
+          },
+        ),
+      ),
+    );
     selectableGroup.unselectAll();
     store.loadDocuments();
+  }
+
+  void _showSnackBar(BuildContext context, String message,
+      [SnackBarAction? action]) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        action: action,
+      ),
+    );
   }
 
   void _add() {

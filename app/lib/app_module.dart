@@ -7,6 +7,7 @@ import 'package:doc_warehouse/features/data/repository/document_repository_impl.
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_document_usecase.dart';
+import 'package:doc_warehouse/features/domain/usecases/delete_documents_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/get_documents_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/update_document_usecase.dart';
@@ -29,6 +30,7 @@ class AppModule extends Module {
     Bind((i) => UpdateDocumentUseCase(i()), isSingleton: false),
     Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DeleteDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => DeleteDocumentsUseCase(i()), isSingleton: false),
     Bind((i) => ListDocumentsStore(i()), isSingleton: false),
     Bind((i) => DateFormatter()),
     Bind((i) => FileDataLoader()),
