@@ -8,4 +8,5 @@ abstract class DocumentDataSource {
   Future<int> create(DocumentModel model);
   Future<void> update(DocumentModel model);
   Future<void> deleteById(int id);
+  Future<void> deleteAllById(List<int> ids);
 }

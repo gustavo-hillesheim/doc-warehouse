@@ -144,6 +144,26 @@ void main() {
       expect(e, isA<DatabaseException>());
     }
   });
+
+  test('should execute correct query on deleteAllById', () async {
+    when(() => database.delete(any(), any())).thenAnswer((_) async {});
+
+    await datasource.deleteAllById([1, 2, 3]);
+
+    verify(() => database.delete("DELETE FROM documents WHERE id IN (?, ?, ?)", [1, 2, 3]))
+        .called(1);
+  });
+
+  test('should throw Exception when database throws Exception', () async {
+    when(() => database.delete(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.deleteAllById([1]);
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
 }
 
 class MockDatabase extends Mock implements AppDatabase {}

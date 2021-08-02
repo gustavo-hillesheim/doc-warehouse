@@ -10,4 +10,5 @@ abstract class DocumentRepository {
   Future<Either<Failure, Document>> create(Document document);
   Future<Either<Failure, Document>> update(Document document);
   Future<Either<Failure, void>> deleteById(int id);
+  Future<Either<Failure, void>> deleteAll(List<Document> documents);
 }

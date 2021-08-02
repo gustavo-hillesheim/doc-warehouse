@@ -69,8 +69,7 @@ void main() {
   test('should throw error when updating Document without id', () async {
     final result = await repository.update(mockDocument);
 
-    expect(result,
-        Left(BusinessFailure('The given document does not have an id')));
+    expect(result, Left(BusinessFailure('O documento não possui ID')));
   });
 
   test(
@@ -122,6 +121,39 @@ void main() {
 
     expect(result, Left(DatabaseFailure('Database error')));
     verify(() => datasource.deleteById(1)).called(1);
+  });
+
+  test('should delete given Documents', () async {
+    when(() => datasource.deleteAllById(any())).thenAnswer((_) async {});
+
+    final documentsToDelete = [
+      mockDocumentWithId.copyWith(id: 1),
+      mockDocumentWithId.copyWith(id: 2)
+    ];
+    final result = await repository.deleteAll(documentsToDelete);
+
+    expect(result, Right(null));
+    verify(() => datasource.deleteAllById([1, 2])).called(1);
+  });
+
+  test('should return Failure if a document does not have an id', () async {
+    final result = await repository.deleteAll([mockDocumentWithId, mockDocument]);
+
+    expect(result, Left(DatabaseFailure('Não é possível remover documentos sem ID')));
+  });
+
+  test('should return DatabaseFailure on exception on delete', () async {
+    when(() => datasource.deleteAllById(any()))
+        .thenThrow(DatabaseException('Database error'));
+
+    final documentsToDelete = [
+      mockDocumentWithId.copyWith(id: 1),
+      mockDocumentWithId.copyWith(id: 2)
+    ];
+    final result = await repository.deleteAll(documentsToDelete);
+
+    expect(result, Left(DatabaseFailure('Database error')));
+    verify(() => datasource.deleteAllById([1, 2])).called(1);
   });
 }
 

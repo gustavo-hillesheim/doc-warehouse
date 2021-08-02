@@ -36,7 +36,7 @@ class DocumentRepositoryImpl extends DocumentRepository {
   @override
   Future<Either<Failure, Document>> update(Document document) async {
     if (document.id == null) {
-      return Left(BusinessFailure("The given document does not have an id"));
+      return Left(BusinessFailure("O documento não possui ID"));
     }
     try {
       await datasource.update(DocumentModel.fromDocument(document));
@@ -60,6 +60,24 @@ class DocumentRepositoryImpl extends DocumentRepository {
   Future<Either<Failure, void>> deleteById(int id) async {
     try {
       await datasource.deleteById(id);
+      return Right(null);
+    } on DatabaseException catch(e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAll(List<Document> documents) async {
+    final ids = <int>[];
+    for (final document in documents) {
+      if (document.id == null) {
+        return Left(DatabaseFailure('Não é possível remover documentos sem ID'));
+      } else {
+        ids.add(document.id!);
+      }
+    }
+    try {
+      await datasource.deleteAllById(ids);
       return Right(null);
     } on DatabaseException catch(e) {
       return Left(DatabaseFailure(e.message));

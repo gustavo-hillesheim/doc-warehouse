@@ -17,7 +17,7 @@ class DocumentDataSourceImpl extends DocumentDataSource {
           .map((json) => DocumentModel.fromJson(json))
           .toList(growable: false);
     } on Exception catch (e) {
-      throw new DatabaseException("Could not query documents", e);
+      throw DatabaseException("Could not query documents", e);
     }
   }
 
@@ -36,7 +36,7 @@ class DocumentDataSourceImpl extends DocumentDataSource {
       );
       return insertResult.id;
     } on Exception catch (e) {
-      throw new DatabaseException("Could not insert document", e);
+      throw DatabaseException("Could not insert document", e);
     }
   }
 
@@ -56,7 +56,7 @@ class DocumentDataSourceImpl extends DocumentDataSource {
         ],
       );
     } on Exception catch (e) {
-      throw new DatabaseException("Could not update document", e);
+      throw DatabaseException("Could not update document", e);
     }
   }
 
@@ -68,11 +68,11 @@ class DocumentDataSourceImpl extends DocumentDataSource {
           "FROM documents WHERE id = ?",
           [id]);
       if (queryResult.data.isEmpty) {
-        throw new DatabaseException("Could not find document with id $id");
+        throw DatabaseException("Could not find document with id $id");
       }
       return DocumentModel.fromJson(queryResult.data.first);
     } on Exception catch (e) {
-      throw new DatabaseException("Could not query document with id $id", e);
+      throw DatabaseException("Could not query document with id $id", e);
     }
   }
 
@@ -81,7 +81,17 @@ class DocumentDataSourceImpl extends DocumentDataSource {
     try {
       await database.delete("DELETE FROM documents WHERE id = ?", [id]);
     } on Exception catch (e) {
-      throw new DatabaseException("Could not delete document with id $id", e);
+      throw DatabaseException("Could not delete document with id $id", e);
+    }
+  }
+
+  @override
+  Future<void> deleteAllById(List<int> ids) async {
+    try {
+      final idsPlaceholder = List.filled(ids.length, '?').join(', ');
+      await database.delete("DELETE FROM documents WHERE id IN ($idsPlaceholder)", ids);
+    } on Exception catch (e) {
+      throw DatabaseException("Could not delete documents with ids $ids", e);
     }
   }
 }
