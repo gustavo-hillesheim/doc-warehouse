@@ -1,6 +1,7 @@
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/presenter/widgets/file_selector.dart';
 import 'package:doc_warehouse/features/presenter/widgets/page_view_form.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class DocumentForm extends StatefulWidget {
@@ -45,7 +46,7 @@ class _DocumentFormState extends State<DocumentForm> {
         pages: [
           _fileSelectorPage(),
           _nameInputPage(),
-          _descriptionInputPage(),
+          _buildDescriptionInput(),
         ],
         onCancel: widget.onCancel,
         onSave: _onSave,
@@ -111,13 +112,15 @@ class _DocumentFormState extends State<DocumentForm> {
     );
   }
 
-  PageInput _descriptionInputPage() {
+  PageInput _buildDescriptionInput() {
     return PageInput(
       titleBuilder: (_) => Text('O que é esse arquivo?'),
       inputBuilder: (_, onChanged) => TextField(
         controller: _descriptionController,
         onChanged: (_) => onChanged(),
         decoration: InputDecoration(labelText: 'Descrição (Opcional)'),
+        maxLines: null,
+        keyboardType: TextInputType.multiline,
       ),
     );
   }

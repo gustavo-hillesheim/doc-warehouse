@@ -93,6 +93,7 @@ class _PageViewFormState extends State<PageViewForm> {
 
   Widget _pageBuilder(BuildContext context, int pageIndex) {
     final page = widget.pages.elementAt(pageIndex);
+    WidgetsBinding.instance!.addPostFrameCallback((_) => _updateMovementRestrictions());
     return page.build(context, _updateMovementRestrictions);
   }
 
