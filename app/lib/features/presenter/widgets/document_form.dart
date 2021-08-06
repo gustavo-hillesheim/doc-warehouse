@@ -43,9 +43,9 @@ class _DocumentFormState extends State<DocumentForm> {
       style: TextStyle(color: Theme.of(context).primaryColor),
       child: PageViewForm(
         pages: [
-          (_, onChange) => _buildFileSelector(onChange),
-          (_, onChange) => _buildNameInput(onChange),
-          (_, onChange) => _buildDescriptionInput(onChange),
+          _fileSelectorPage(),
+          _nameInputPage(),
+          _descriptionInputPage(),
         ],
         onCancel: widget.onCancel,
         onSave: _onSave,
@@ -67,10 +67,10 @@ class _DocumentFormState extends State<DocumentForm> {
     widget.onSave(document);
   }
 
-  PageInput _buildFileSelector(VoidCallback onChange) {
+  PageInput _fileSelectorPage() {
     return PageInput(
-      title: Text('Escolha um arquivo'),
-      input: Center(
+      titleBuilder: (_) => Text('Escolha um arquivo'),
+      inputBuilder: (_, onChanged) => Center(
           child: Column(
         children: [
           FractionallySizedBox(
@@ -85,7 +85,7 @@ class _DocumentFormState extends State<DocumentForm> {
                     if (_nameController.text.isEmpty) {
                       _nameController.text = file.name;
                     }
-                    onChange();
+                    onChanged();
                   },
                 ),
               ),
@@ -98,12 +98,12 @@ class _DocumentFormState extends State<DocumentForm> {
     );
   }
 
-  PageInput _buildNameInput(VoidCallback onChange) {
+  PageInput _nameInputPage() {
     return PageInput(
-      title: Text('Qual o nome do arquivo?'),
-      input: TextField(
+      titleBuilder: (_) => Text('Qual o nome do arquivo?'),
+      inputBuilder: (_, onChanged) => TextField(
         controller: _nameController,
-        onChanged: (_) => onChange(),
+        onChanged: (_) => onChanged(),
         showCursor: false,
         decoration: InputDecoration(labelText: 'Nome'),
       ),
@@ -111,12 +111,12 @@ class _DocumentFormState extends State<DocumentForm> {
     );
   }
 
-  PageInput _buildDescriptionInput(VoidCallback onChange) {
+  PageInput _descriptionInputPage() {
     return PageInput(
-      title: Text('O que é esse arquivo?'),
-      input: TextField(
+      titleBuilder: (_) => Text('O que é esse arquivo?'),
+      inputBuilder: (_, onChanged) => TextField(
         controller: _descriptionController,
-        onChanged: (_) => onChange(),
+        onChanged: (_) => onChanged(),
         decoration: InputDecoration(labelText: 'Descrição (Opcional)'),
       ),
     );

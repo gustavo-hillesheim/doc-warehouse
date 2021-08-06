@@ -2,13 +2,10 @@ import 'package:doc_warehouse/features/presenter/widgets/custom_text_button.dart
 import 'package:flutter/material.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
 
-typedef PageInputBuilder = PageInput Function(
-    BuildContext context, VoidCallback runValidator);
-
 class PageViewForm extends StatefulWidget {
   final VoidCallback onCancel;
   final VoidCallback onSave;
-  final List<PageInputBuilder> pages;
+  final List<PageInput> pages;
 
   PageViewForm({required this.pages, required this.onCancel, required this.onSave});
 
@@ -18,7 +15,6 @@ class PageViewForm extends StatefulWidget {
 
 class _PageViewFormState extends State<PageViewForm> {
   final PageController _controller = PageController();
-  PageInput? _currentPage;
   bool _isValid = false;
   int _currentPageIndex = 0;
 
@@ -96,18 +92,16 @@ class _PageViewFormState extends State<PageViewForm> {
       );
 
   Widget _pageBuilder(BuildContext context, int pageIndex) {
-    _currentPage =
-        widget.pages.elementAt(pageIndex)(context, _updateMovementRestrictions);
-    WidgetsBinding.instance!
-        .addPostFrameCallback((_) => _updateMovementRestrictions());
-    return _PageInputWidget(_currentPage!);
+    final page = widget.pages.elementAt(pageIndex);
+    return page.build(context, _updateMovementRestrictions);
   }
 
   bool _runCurrentPageValidator() {
-    if (_currentPage?.validator == null) {
+    final currentPage = widget.pages.elementAt(_currentPageIndex);
+    if (currentPage.validator == null) {
       return true;
     } else {
-      return _currentPage!.validator!();
+      return currentPage.validator!();
     }
   }
 
@@ -123,6 +117,7 @@ class _PageViewFormState extends State<PageViewForm> {
   void _updateCurrentPage(int newPageIndex) {
     setState(() {
       _currentPageIndex = newPageIndex;
+      _updateMovementRestrictions();
     });
   }
 
@@ -141,21 +136,16 @@ class _PageViewFormState extends State<PageViewForm> {
   bool get _isLastPage => _currentPageIndex == widget.pages.length - 1;
 }
 
+typedef InputBuilder = Widget Function(BuildContext context, VoidCallback onChanged);
+
 class PageInput {
-  final Widget title;
-  final Widget input;
+  final WidgetBuilder titleBuilder;
+  final InputBuilder inputBuilder;
   final ValueGetter<bool>? validator;
 
-  const PageInput({required this.title, required this.input, this.validator});
-}
+  const PageInput({required this.titleBuilder, required this.inputBuilder, this.validator});
 
-class _PageInputWidget extends StatelessWidget {
-  final PageInput pageInput;
-
-  _PageInputWidget(this.pageInput);
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, VoidCallback onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -165,13 +155,13 @@ class _PageInputWidget extends StatelessWidget {
             style: DefaultTextStyle.of(context).style.copyWith(
               fontSize: 32,
             ),
-            child: pageInput.title,
+            child: titleBuilder(context),
           ),
         ),
         Spacer(),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: pageInput.input,
+          child: inputBuilder(context, onChanged),
         ),
         Spacer(),
       ],
