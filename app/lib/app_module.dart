@@ -33,7 +33,7 @@ class AppModule extends Module {
     Bind((i) => DocumentDataSourceImpl(i())),
     Bind((i) => GetDocumentsUseCase(i()), isSingleton: false),
     Bind((i) => CreateDocumentUseCase(i(), i()), isSingleton: false),
-    Bind((i) => UpdateDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => UpdateDocumentUseCase(i(), i()), isSingleton: false),
     Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DeleteDocumentUseCase(i(), i()), isSingleton: false),
     Bind((i) => DeleteDocumentsUseCase(i(), i()), isSingleton: false),
