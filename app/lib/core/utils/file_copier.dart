@@ -1,8 +1,13 @@
 import 'dart:io';
 
+import 'package:doc_warehouse/core/utils/file_deleter.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileCopier {
+  final FileDeleter fileDeleter;
+
+  FileCopier(this.fileDeleter);
+
   Future<File> createInternalFile({
     required String sourcePath,
     required String name,
@@ -14,9 +19,7 @@ class FileCopier {
     internalFile.createSync(recursive: true);
     internalFile.writeAsBytesSync(sourceFile.readAsBytesSync());
     if (deleteSource) {
-      sourceFile.delete().catchError((error) {
-        print("Could not delete file ${sourceFile.path}: $error");
-      });
+      await fileDeleter.delete(sourceFile.path);
     }
     return internalFile;
   }

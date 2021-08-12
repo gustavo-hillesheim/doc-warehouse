@@ -171,7 +171,8 @@ void main() {
     final nextId = await datasource.getNextId();
 
     expect(nextId, 1);
-    verify(() => database.query("SELECT MAX(id) + 1 as nextId FROM documents")).called(1);
+    verify(() => database.query("SELECT seq + 1 as nextId FROM sqlite_sequence where "
+        "name='documents'")).called(1);
   });
 
   test('should throw Exception when database throws Exception on getNextId', () async {

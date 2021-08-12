@@ -3,6 +3,7 @@ import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/core/utils/file_copier.dart';
 import 'package:doc_warehouse/core/utils/file_data_loader.dart';
+import 'package:doc_warehouse/core/utils/file_deleter.dart';
 import 'package:doc_warehouse/core/utils/share_intent_receiver.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
 import 'package:doc_warehouse/features/data/repository/document_repository_impl.dart';
@@ -26,15 +27,16 @@ class AppModule extends Module {
   @override
   final List<Bind> binds = [
     AsyncBind((i) => AppDatabaseFactory.createInstance()),
-    Bind((i) => FileCopier()),
+    Bind((i) => FileDeleter()),
+    Bind((i) => FileCopier(i())),
     Bind((i) => DocumentRepositoryImpl(i())),
     Bind((i) => DocumentDataSourceImpl(i())),
     Bind((i) => GetDocumentsUseCase(i()), isSingleton: false),
     Bind((i) => CreateDocumentUseCase(i(), i()), isSingleton: false),
     Bind((i) => UpdateDocumentUseCase(i()), isSingleton: false),
     Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
-    Bind((i) => DeleteDocumentUseCase(i()), isSingleton: false),
-    Bind((i) => DeleteDocumentsUseCase(i()), isSingleton: false),
+    Bind((i) => DeleteDocumentUseCase(i(), i()), isSingleton: false),
+    Bind((i) => DeleteDocumentsUseCase(i(), i()), isSingleton: false),
     Bind((i) => ListDocumentsStore(i()), isSingleton: false),
     Bind((i) => DateFormatter()),
     Bind((i) => FileDataLoader()),

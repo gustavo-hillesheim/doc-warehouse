@@ -29,7 +29,7 @@ class CreateDocumentUseCase extends UseCase<Document, Document> {
         deleteSource: true,
       );
     } on Exception catch(e) {
-      debugPrint(e.toString());
+      debugPrint("Could not copy file ${document.filePath}: $e");
       return Left(InternalFailure('Não foi possível copiar o arquivo para o diretório da aplicação'));
     }
     return repository.create(document.copyWith(

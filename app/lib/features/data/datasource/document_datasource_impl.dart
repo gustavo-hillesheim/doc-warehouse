@@ -100,8 +100,9 @@ class DocumentDataSourceImpl extends DocumentDataSource {
   Future<int> getNextId() async {
     try {
       final result =
-          await database.query("SELECT MAX(id) + 1 as nextId FROM documents");
-      return result.data.first['nextId'] as int;
+          await database.query("SELECT seq + 1 as nextId FROM sqlite_sequence where "
+              "name='documents'");
+      return result.data.first['nextId'] ?? 1;
     } on Exception catch (e) {
       throw DatabaseException("Could not query next id", e);
     }

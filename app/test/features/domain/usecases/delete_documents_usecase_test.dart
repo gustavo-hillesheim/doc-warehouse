@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:doc_warehouse/core/errors/failure.dart';
+import 'package:doc_warehouse/core/utils/file_deleter.dart';
 import 'package:doc_warehouse/features/domain/repository/document_repository.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_documents_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,15 +9,18 @@ import 'package:mocktail/mocktail.dart';
 import '../../../mocks/document_model_mock.dart';
 
 void main() {
+  late FileDeleter fileDeleter;
   late DocumentRepository repository;
   late DeleteDocumentsUseCase usecase;
 
   setUp(() {
+    fileDeleter = MockFileDeleter();
     repository = MockDocumentRepository();
-    usecase = DeleteDocumentsUseCase(repository);
+    usecase = DeleteDocumentsUseCase(repository, fileDeleter);
   });
 
   test('should delete all specified documents', () async {
+    when(() => fileDeleter.deleteAll(any())).thenAnswer((_) async {});
     when(() => repository.deleteAll(any())).thenAnswer((_) async => Right(null));
 
     final documentToDelete = [
@@ -42,6 +46,8 @@ void main() {
 }
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
+
+class MockFileDeleter extends Mock implements FileDeleter {}
 
 class FakeFailure extends Failure {
   final String message;
