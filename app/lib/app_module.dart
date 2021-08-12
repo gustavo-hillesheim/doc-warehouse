@@ -1,6 +1,7 @@
 import 'package:doc_warehouse/app_guard.dart';
 import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/utils/date_formatter.dart';
+import 'package:doc_warehouse/core/utils/file_copier.dart';
 import 'package:doc_warehouse/core/utils/file_data_loader.dart';
 import 'package:doc_warehouse/core/utils/share_intent_receiver.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
@@ -25,10 +26,11 @@ class AppModule extends Module {
   @override
   final List<Bind> binds = [
     AsyncBind((i) => AppDatabaseFactory.createInstance()),
+    Bind((i) => FileCopier()),
     Bind((i) => DocumentRepositoryImpl(i())),
     Bind((i) => DocumentDataSourceImpl(i())),
     Bind((i) => GetDocumentsUseCase(i()), isSingleton: false),
-    Bind((i) => CreateDocumentUseCase(i()), isSingleton: false),
+    Bind((i) => CreateDocumentUseCase(i(), i()), isSingleton: false),
     Bind((i) => UpdateDocumentUseCase(i()), isSingleton: false),
     Bind((i) => GetDocumentUseCase(i()), isSingleton: false),
     Bind((i) => DeleteDocumentUseCase(i()), isSingleton: false),

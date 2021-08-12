@@ -3,13 +3,14 @@ import 'package:doc_warehouse/core/errors/exceptions.dart';
 import 'package:doc_warehouse/core/errors/failure.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource.dart';
 import 'package:doc_warehouse/features/data/repository/document_repository_impl.dart';
+import 'package:doc_warehouse/features/domain/repository/document_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../mocks/document_model_mock.dart';
 
 void main() {
-  late DocumentRepositoryImpl repository;
+  late DocumentRepository repository;
   late DocumentDataSource datasource;
 
   setUp(() {
@@ -154,6 +155,24 @@ void main() {
 
     expect(result, Left(DatabaseFailure('Database error')));
     verify(() => datasource.deleteAllById([1, 2])).called(1);
+  });
+
+  test('should return next id', () async {
+    when(() => datasource.getNextId()).thenAnswer((_) async => 1);
+
+    final result = await repository.getNextId();
+
+    expect(result, Right(1));
+    verify(() => datasource.getNextId()).called(1);
+  });
+
+  test('should return Left on Exception on getNextId', () async {
+    when(() => datasource.getNextId()).thenThrow(DatabaseException('This is an exception'));
+
+    final result = await repository.getNextId();
+
+    expect(result, Left(DatabaseFailure('This is an exception')));
+    verify(() => datasource.getNextId()).called(1);
   });
 }
 

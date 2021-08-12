@@ -83,4 +83,13 @@ class DocumentRepositoryImpl extends DocumentRepository {
       return Left(DatabaseFailure(e.message));
     }
   }
+
+  @override
+  Future<Either<Failure, int>> getNextId() async {
+    try {
+      return Right(await datasource.getNextId());
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
 }

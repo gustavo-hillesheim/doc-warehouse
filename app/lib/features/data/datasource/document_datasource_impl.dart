@@ -89,9 +89,21 @@ class DocumentDataSourceImpl extends DocumentDataSource {
   Future<void> deleteAllById(List<int> ids) async {
     try {
       final idsPlaceholder = List.filled(ids.length, '?').join(', ');
-      await database.delete("DELETE FROM documents WHERE id IN ($idsPlaceholder)", ids);
+      await database.delete(
+          "DELETE FROM documents WHERE id IN ($idsPlaceholder)", ids);
     } on Exception catch (e) {
       throw DatabaseException("Could not delete documents with ids $ids", e);
+    }
+  }
+
+  @override
+  Future<int> getNextId() async {
+    try {
+      final result =
+          await database.query("SELECT MAX(id) + 1 as nextId FROM documents");
+      return result.data.first['nextId'] as int;
+    } on Exception catch (e) {
+      throw DatabaseException("Could not query next id", e);
     }
   }
 }

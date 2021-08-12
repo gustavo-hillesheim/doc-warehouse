@@ -154,11 +154,31 @@ void main() {
         .called(1);
   });
 
-  test('should throw Exception when database throws Exception', () async {
+  test('should throw Exception when database throws Exception on deleteAllById', () async {
     when(() => database.delete(any(), any())).thenThrow(Exception('lol'));
 
     try {
       await datasource.deleteAllById([1]);
+      fail("Should have thrown exception");
+    } on Exception catch (e) {
+      expect(e, isA<DatabaseException>());
+    }
+  });
+
+  test('should return next document id', () async {
+    when(() => database.query(any(), any())).thenAnswer((_) async => QueryResult([{'nextId': 1}]));
+
+    final nextId = await datasource.getNextId();
+
+    expect(nextId, 1);
+    verify(() => database.query("SELECT MAX(id) + 1 as nextId FROM documents")).called(1);
+  });
+
+  test('should throw Exception when database throws Exception on getNextId', () async {
+    when(() => database.query(any(), any())).thenThrow(Exception('lol'));
+
+    try {
+      await datasource.getNextId();
       fail("Should have thrown exception");
     } on Exception catch (e) {
       expect(e, isA<DatabaseException>());
