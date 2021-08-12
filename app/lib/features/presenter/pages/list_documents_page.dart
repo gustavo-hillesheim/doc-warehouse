@@ -1,4 +1,5 @@
 import 'package:doc_warehouse/core/errors/failure.dart';
+import 'package:doc_warehouse/core/utils/share_intent_receiver.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
 import 'package:doc_warehouse/features/domain/usecases/create_document_usecase.dart';
 import 'package:doc_warehouse/features/domain/usecases/delete_documents_usecase.dart';
@@ -18,10 +19,25 @@ class ListDocumentsPage extends StatefulWidget {
 
 class _ListDocumentsPageState
     extends ModularState<ListDocumentsPage, ListDocumentsStore> {
+  final _shareIntentReceiver = ShareIntentReceiver();
+
   @override
   void initState() {
     super.initState();
+    _shareIntentReceiver.fileStream.listen((sharedFile) async {
+      Modular.to.pushNamed(Routes.saveSharedDocument, arguments: sharedFile).then((shouldReload) {
+        if (shouldReload == true) {
+          store.loadDocuments();
+        }
+      });
+    });
     store.loadDocuments();
+  }
+
+  @override
+  void dispose() {
+    _shareIntentReceiver.close();
+    super.dispose();
   }
 
   @override

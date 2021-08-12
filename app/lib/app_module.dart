@@ -2,6 +2,7 @@ import 'package:doc_warehouse/app_guard.dart';
 import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/utils/date_formatter.dart';
 import 'package:doc_warehouse/core/utils/file_data_loader.dart';
+import 'package:doc_warehouse/core/utils/share_intent_receiver.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource_impl.dart';
 import 'package:doc_warehouse/features/data/repository/document_repository_impl.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
@@ -14,6 +15,7 @@ import 'package:doc_warehouse/features/domain/usecases/update_document_usecase.d
 import 'package:doc_warehouse/features/presenter/controller/list_documents_store.dart';
 import 'package:doc_warehouse/features/presenter/pages/create_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/list_documents_page.dart';
+import 'package:doc_warehouse/features/presenter/pages/save_shared_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/update_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/view_document_page.dart';
 import 'package:doc_warehouse/routes.dart';
@@ -51,17 +53,31 @@ class AppModule extends Module {
     ChildRoute(
       Routes.editDocument,
       child: (_, route) {
-        print(route.data);
         if (route.data is Document) {
           return UpdateDocumentPage(route.data);
         }
-        throw Exception('The "${Routes.editDocument}" route must receive a document as parameter');
+        throw Exception('The "${Routes.editDocument}" route must receive a Document as parameter');
       },
       guards: [AppGuard()],
     ),
     ChildRoute(
       Routes.viewDocument,
-      child: (_, route) => ViewDocumentPage(route.data),
+      child: (_, route) {
+        if (route.data is Document) {
+          return ViewDocumentPage(route.data);
+        }
+        throw Exception('The "${Routes.viewDocument}" route must receive a Document as parameter');
+      },
+      guards: [AppGuard()],
+    ),
+    ChildRoute(
+      Routes.saveSharedDocument,
+      child: (_, route) {
+        if (route.data is SharedFile) {
+          return SaveSharedDocumentPage(route.data);
+        }
+        throw Exception('The "${Routes.saveSharedDocument}" route must receive a SharedFile as parameter');
+      },
       guards: [AppGuard()],
     )
   ];

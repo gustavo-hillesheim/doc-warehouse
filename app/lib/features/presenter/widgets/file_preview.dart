@@ -7,8 +7,9 @@ import 'package:flutter_modular/flutter_modular.dart';
 
 class FilePreview extends StatefulWidget {
   final String path;
+  final String? heroTag;
 
-  FilePreview({required this.path});
+  FilePreview({required this.path, this.heroTag});
 
   @override
   _FilePreviewState createState() => _FilePreviewState();
@@ -35,15 +36,16 @@ class _FilePreviewState extends State<FilePreview> {
 
   @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: widget.path,
-      child: Container(
-        color: Theme.of(context).primaryColorLight,
-        child: _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : (_data != null ? _preview(_data!) : _ErrorIndicator()),
-      ),
+    final result = Container(
+      color: Theme.of(context).primaryColorLight,
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : (_data != null ? _preview(_data!) : _ErrorIndicator()),
     );
+    return widget.heroTag != null ? Hero(
+      tag: widget.heroTag!,
+      child: result,
+    ): result;
   }
 
   Widget _preview(FileData data) => PreviewMediaWidget(
@@ -65,10 +67,12 @@ class _FilePreviewState extends State<FilePreview> {
         _isLoading = true;
       });
       final data = await _fileDataLoader.loadFromPath(path);
-      setState(() {
-        _data = data;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _data = data;
+          _isLoading = false;
+        });
+      }
     }
   }
 }
@@ -79,7 +83,7 @@ class _ErrorIndicator extends StatelessWidget {
   _ErrorIndicator([this.icon = Icons.error_outline]);
 
   factory _ErrorIndicator.fromMediaProvider(MediaProvider provider) {
-    IconData icon = Icons.error_outline;
+    IconData icon = Icons.help_outline_outlined;
     if (provider.isAudio) {
       icon = Icons.audiotrack_outlined;
     }
@@ -91,6 +95,9 @@ class _ErrorIndicator extends StatelessWidget {
     }
     if (provider.isApplication) {
       icon = Icons.picture_as_pdf_outlined;
+    }
+    if (provider.isText) {
+      icon = Icons.text_snippet_outlined;
     }
     return _ErrorIndicator(icon);
   }
