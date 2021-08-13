@@ -2,6 +2,7 @@ import 'package:doc_warehouse/core/database/app_database.dart';
 import 'package:doc_warehouse/core/errors/exceptions.dart';
 import 'package:doc_warehouse/features/data/datasource/document_datasource.dart';
 import 'package:doc_warehouse/features/data/models/document_model.dart';
+import 'package:flutter/foundation.dart';
 
 class DocumentDataSourceImpl extends DocumentDataSource {
   final AppDatabase database;
@@ -9,14 +10,20 @@ class DocumentDataSourceImpl extends DocumentDataSource {
   DocumentDataSourceImpl(this.database);
 
   @override
-  Future<List<DocumentModel>> getAll() async {
+  Future<List<DocumentModel>> getAll({String? name}) async {
     try {
-      final queryResult = await database.query(
-          "SELECT id, name, description, filePath, creationTime FROM documents");
+      String query = "SELECT id, name, description, filePath, creationTime FROM documents";
+      List queryArgs = [];
+      if (name != null) {
+        query += " WHERE UPPER(name) LIKE '%' || UPPER(?) || '%'";
+        queryArgs.add(name);
+      }
+      final queryResult = await database.query(query, queryArgs);
       return queryResult.data
           .map((json) => DocumentModel.fromJson(json))
           .toList(growable: false);
     } on Exception catch (e) {
+      debugPrint('Error on querying documents: $e');
       throw DatabaseException("Could not query documents", e);
     }
   }

@@ -19,19 +19,32 @@ void main() {
   });
 
   test('should execute correct query on getAll', () async {
-    when(() => database.query(any())).thenAnswer(
+    when(() => database.query(any(), any())).thenAnswer(
         (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
 
     final result = await datasource.getAll();
 
     expect(result, [mockDocumentModelJsonInstance]);
     verify(() => database.query(
-            "SELECT id, name, description, filePath, creationTime FROM documents"))
+            "SELECT id, name, description, filePath, creationTime FROM documents", []))
         .called(1);
   });
 
+  test('should execute correct query on getAll with filter', () async {
+    when(() => database.query(any(), any())).thenAnswer(
+        (_) async => QueryResult([jsonDecode(mockDocumentModelJson)]));
+
+    final result = await datasource.getAll(name: 'filteredDocument');
+
+    expect(result, [mockDocumentModelJsonInstance]);
+    verify(() => database.query(
+        "SELECT id, name, description, filePath, creationTime FROM documents "
+        "WHERE UPPER(name) LIKE '%' || UPPER(?) || '%'",
+        ['filteredDocument'])).called(1);
+  });
+
   test('should throw DatabaseException on error on getAll', () async {
-    when(() => database.query(any())).thenThrow(Exception('lol'));
+    when(() => database.query(any(), any())).thenThrow(Exception('lol'));
 
     try {
       await datasource.getAll();
@@ -150,11 +163,12 @@ void main() {
 
     await datasource.deleteAllById([1, 2, 3]);
 
-    verify(() => database.delete("DELETE FROM documents WHERE id IN (?, ?, ?)", [1, 2, 3]))
-        .called(1);
+    verify(() => database.delete(
+        "DELETE FROM documents WHERE id IN (?, ?, ?)", [1, 2, 3])).called(1);
   });
 
-  test('should throw Exception when database throws Exception on deleteAllById', () async {
+  test('should throw Exception when database throws Exception on deleteAllById',
+      () async {
     when(() => database.delete(any(), any())).thenThrow(Exception('lol'));
 
     try {
@@ -166,16 +180,21 @@ void main() {
   });
 
   test('should return next document id', () async {
-    when(() => database.query(any(), any())).thenAnswer((_) async => QueryResult([{'nextId': 1}]));
+    when(() => database.query(any(), any()))
+        .thenAnswer((_) async => QueryResult([
+              {'nextId': 1}
+            ]));
 
     final nextId = await datasource.getNextId();
 
     expect(nextId, 1);
-    verify(() => database.query("SELECT seq + 1 as nextId FROM sqlite_sequence where "
-        "name='documents'")).called(1);
+    verify(() =>
+        database.query("SELECT seq + 1 as nextId FROM sqlite_sequence where "
+            "name='documents'")).called(1);
   });
 
-  test('should throw Exception when database throws Exception on getNextId', () async {
+  test('should throw Exception when database throws Exception on getNextId',
+      () async {
     when(() => database.query(any(), any())).thenThrow(Exception('lol'));
 
     try {

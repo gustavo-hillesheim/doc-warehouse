@@ -18,13 +18,23 @@ void main() {
     repository = DocumentRepositoryImpl(datasource);
   });
 
-  test('should return Document model and acll datasource', () async {
+  test('should return Document model and call datasource', () async {
     when(datasource.getAll).thenAnswer((_) async => mockDocumentsModel);
 
     final result = await repository.getAll();
 
     expect(result, Right(mockDocumentsModel));
     verify(datasource.getAll).called(1);
+  });
+
+  test('should pass name filter to datasource', () async {
+    when(() => datasource.getAll(name: any(named: 'name'))).thenAnswer((_) async =>
+    mockDocumentsModel);
+
+    final result = await repository.getAll(name: 'nameFilter');
+
+    expect(result, Right(mockDocumentsModel));
+    verify(() => datasource.getAll(name: 'nameFilter')).called(1);
   });
 
   test('should return DatabaseFailure on exception on getDocuments', () async {

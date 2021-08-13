@@ -12,9 +12,9 @@ class DocumentRepositoryImpl extends DocumentRepository {
   DocumentRepositoryImpl(this.datasource);
 
   @override
-  Future<Either<Failure, List<Document>>> getAll() async {
+  Future<Either<Failure, List<Document>>> getAll({String? name}) async {
     try {
-      final result = await datasource.getAll();
+      final result = await datasource.getAll(name: name);
       return Right(result);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
