@@ -8,6 +8,7 @@ import 'package:doc_warehouse/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:share/share.dart';
 
 class ViewDocumentPage extends StatefulWidget {
   final Document document;
@@ -80,23 +81,29 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
               Align(
                 alignment: Alignment.topCenter,
                 child: _IconBar(
-                  onBack: _back,
-                  onDelete: () async {
-                    await Modular.get<DeleteDocumentUseCase>()(document);
-                    Modular.to.pop(true);
-                  },
-                  onEdit: () async {
-                    final newDocument = await Modular.to.pushNamed(
-                      Routes.editDocument,
-                      arguments: document,
-                    );
-                    if (newDocument is Document) {
-                      setState(() {
-                        document = newDocument;
-                      });
-                    }
-                  },
-                ),
+                    onBack: _back,
+                    onDelete: () async {
+                      await Modular.get<DeleteDocumentUseCase>()(document);
+                      Modular.to.pop(true);
+                    },
+                    onEdit: () async {
+                      final newDocument = await Modular.to.pushNamed(
+                        Routes.editDocument,
+                        arguments: document,
+                      );
+                      if (newDocument is Document) {
+                        setState(() {
+                          document = newDocument;
+                        });
+                      }
+                    },
+                    onShare: () {
+                      Share.shareFiles(
+                        [document.filePath],
+                        subject: document.name,
+                        text: document.description,
+                      );
+                    }),
               ),
             ],
           ),
@@ -188,12 +195,14 @@ class _IconBar extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final VoidCallback onShare;
 
   const _IconBar({
     Key? key,
     required this.onBack,
     required this.onDelete,
     required this.onEdit,
+    required this.onShare,
   }) : super(key: key);
 
   @override
@@ -221,6 +230,7 @@ class _IconBar extends StatelessWidget {
             itemBuilder: (_) => [
               _menuItem(Icons.delete_outline, 'Remover', onDelete),
               _menuItem(Icons.edit_outlined, 'Alterar', onEdit),
+              _menuItem(Icons.share_outlined, 'Compartilhar', onShare),
             ],
             onSelected: (selected) {
               selected();
