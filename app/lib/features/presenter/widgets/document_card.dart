@@ -17,7 +17,7 @@ class DocumentCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: Stack(children: [
         Square(
-          child: FilePreview(path: document.filePath),
+          child: FileDisplay(path: document.filePath),
         ),
         Align(
           alignment: Alignment.bottomCenter,

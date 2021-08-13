@@ -117,11 +117,9 @@ class _ViewDocumentPageState extends State<ViewDocumentPage> {
           shadowColor: Colors.transparent,
         ),
         body: Center(
-          child: InteractiveViewer(
-            clipBehavior: Clip.none,
-            child: _DocumentPreview(
-              document: widget.document,
-            ),
+          child: _DocumentPreview(
+            document: widget.document,
+            interactive: true,
           ),
         ),
       );
@@ -133,18 +131,21 @@ class _DocumentPreview extends StatelessWidget {
   final Document document;
   final double width;
   final double height;
+  final bool interactive;
 
   const _DocumentPreview({
     required this.document,
     this.width = double.infinity,
     this.height = double.infinity,
+    this.interactive = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      child: FilePreview(
+      child: FileDisplay(
         path: document.filePath,
+        interactive: interactive,
       ),
       constraints: BoxConstraints(
         minWidth: this.width,

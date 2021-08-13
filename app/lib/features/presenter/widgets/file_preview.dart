@@ -5,17 +5,17 @@ import 'package:enough_media/enough_media.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
-class FilePreview extends StatefulWidget {
+class FileDisplay extends StatefulWidget {
   final String path;
-  final String? heroTag;
+  final bool interactive;
 
-  FilePreview({required this.path, this.heroTag});
+  FileDisplay({required this.path, this.interactive = false});
 
   @override
-  _FilePreviewState createState() => _FilePreviewState();
+  _FileDisplayState createState() => _FileDisplayState();
 }
 
-class _FilePreviewState extends State<FilePreview> {
+class _FileDisplayState extends State<FileDisplay> {
   final _fileDataLoader = Modular.get<FileDataLoader>();
   FileData? _data;
   bool _isLoading = false;
@@ -27,7 +27,7 @@ class _FilePreviewState extends State<FilePreview> {
   }
 
   @override
-  void didUpdateWidget(covariant FilePreview oldWidget) {
+  void didUpdateWidget(covariant FileDisplay oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.path != widget.path) {
       _loadFile(widget.path);
@@ -36,25 +36,41 @@ class _FilePreviewState extends State<FilePreview> {
 
   @override
   Widget build(BuildContext context) {
-    final result = Container(
-      color: Theme.of(context).primaryColorLight,
-      child: _isLoading
-          ? Center(child: CircularProgressIndicator())
-          : (_data != null ? _preview(_data!) : _ErrorIndicator()),
+    Widget content;
+    if (_isLoading) {
+      content = Center(child: CircularProgressIndicator());
+    } else {
+      if (_data != null) {
+        final mediaProvider = MemoryMediaProvider(
+          _data!.file.path,
+          _data!.mimeType,
+          _data!.data,
+        );
+        content = widget.interactive
+            ? _interactive(mediaProvider)
+            : _preview(mediaProvider);
+      } else {
+        content = _ErrorIndicator();
+      }
+    }
+    return Hero(
+      tag: widget.path,
+      child: Container(
+        color: Theme.of(context).primaryColorLight,
+        child: content,
+      ),
     );
-    return widget.heroTag != null ? Hero(
-      tag: widget.heroTag!,
-      child: result,
-    ): result;
   }
 
-  Widget _preview(FileData data) => PreviewMediaWidget(
-        useHeroAnimation: true,
-        mediaProvider: MemoryMediaProvider(
-          data.file.path,
-          data.mimeType,
-          data.data,
-        ),
+  Widget _interactive(MemoryMediaProvider mediaProvider) =>
+      InteractiveMediaWidget(
+        mediaProvider: mediaProvider,
+        fallbackBuilder: (_, provider) =>
+            _ErrorIndicator.fromMediaProvider(provider),
+      );
+
+  Widget _preview(MemoryMediaProvider mediaProvider) => PreviewMediaWidget(
+        mediaProvider: mediaProvider,
         fallbackBuilder: (_, provider) =>
             _ErrorIndicator.fromMediaProvider(provider),
       );
@@ -104,13 +120,13 @@ class _ErrorIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Tooltip(
       message: 'Não foi possível carregar a visualização do arquivo',
       child: Center(
         child: LayoutBuilder(builder: (_, bounds) {
           final maxSize = 64.0;
-          final iconSize = bounds.maxWidth / 3 > maxSize ? maxSize : bounds.maxWidth / 3;
+          final iconSize =
+              bounds.maxWidth / 3 > maxSize ? maxSize : bounds.maxWidth / 3;
           return Icon(icon, size: iconSize);
         }),
       ),
