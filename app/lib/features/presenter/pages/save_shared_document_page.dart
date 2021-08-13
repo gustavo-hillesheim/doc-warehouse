@@ -23,7 +23,7 @@ class _SaveSharedDocumentPageState extends State<SaveSharedDocumentPage> {
     super.initState();
     _formInitialValue = Document(
       filePath: widget.sharedFile.path,
-      name: widget.sharedFile.name,
+      name: widget.sharedFile.name.substring(0, widget.sharedFile.name.lastIndexOf('.')),
       creationTime: DateTime.now(),
     );
   }

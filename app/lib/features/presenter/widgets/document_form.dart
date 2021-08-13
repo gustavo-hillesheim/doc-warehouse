@@ -84,7 +84,7 @@ class _DocumentFormState extends State<DocumentForm> {
                   onSelect: (file) {
                     _selectedFile = file;
                     if (_nameController.text.isEmpty) {
-                      _nameController.text = file.name;
+                      _nameController.text = file.name.substring(0, file.name.lastIndexOf('.'));
                     }
                     onChanged();
                   },
