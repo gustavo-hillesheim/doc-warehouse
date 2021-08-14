@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.gustavohill.doc_warehouse">
    <application
-        android:label="doc_warehouse"
-        android:icon="@mipmap/ic_launcher">
+        android:label="File Depo"
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleInstance"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
