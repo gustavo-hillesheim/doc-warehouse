@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:doc_warehouse/core/errors/failure.dart';
 import 'package:doc_warehouse/core/utils/share_intent_receiver.dart';
 import 'package:doc_warehouse/features/domain/entities/document.dart';
@@ -20,6 +21,7 @@ class ListDocumentsPage extends StatefulWidget {
 class _ListDocumentsPageState
     extends ModularState<ListDocumentsPage, ListDocumentsStore> {
   final _shareIntentReceiver = ShareIntentReceiver();
+  String? filter;
 
   @override
   void initState() {
@@ -69,53 +71,90 @@ class _ListDocumentsPageState
                   color: Theme.of(context).primaryColorDark,
                 ),
               ),
-        actions: isSelectMode ? [] : [
-          IconButton(
-            icon: Icon(
-              Icons.filter_list_outlined,
-              color: Theme.of(context).primaryColorDark,
-            ),
-            onPressed: _openFilter,
-            splashRadius: 24
-          ),
-        ],
+        actions: isSelectMode
+            ? []
+            : [
+                IconButton(
+                    icon: Badge(
+                      badgeContent: Text('1'),
+                      showBadge: filter != null && filter!.isNotEmpty,
+                      badgeColor: Colors.red,
+                      child: Icon(
+                        Icons.filter_list_outlined,
+                        color: Theme.of(context).primaryColorDark,
+                      ),
+                    ),
+                    onPressed: _openFilter,
+                    splashRadius: 24),
+              ],
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
       );
 
   void _openFilter() {
     var overlayEntry;
-    final focusNode = FocusNode()..requestFocus();
-    overlayEntry = OverlayEntry(builder: (context) {
-      return Material(
-        color: Colors.transparent,
-        child: Column(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => overlayEntry.remove(),
-              ),
-            ),
-            PhysicalModel(
-              color: Theme.of(context).backgroundColor,
-              elevation: 16,
-              shadowColor: Colors.black,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: TextField(
-                  focusNode: focusNode,
-                  onChanged: store.loadDocuments,
+    final textController = TextEditingController(text: filter);
+    final textFieldfocusNode = FocusNode()..requestFocus();
+    overlayEntry = OverlayEntry(
+        builder: (context) {
+          return Material(
+            color: Colors.transparent,
+            child: Column(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => overlayEntry.remove(),
+                  ),
                 ),
-              ),
+                PhysicalModel(
+                  color: Theme.of(context).backgroundColor,
+                  elevation: 16,
+                  shadowColor: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: textController,
+                            focusNode: textFieldfocusNode,
+                            onChanged: _updateFilter,
+                            onEditingComplete: overlayEntry.remove,
+                            onSaved: (_) => overlayEntry.remove(),
+                            onFieldSubmitted: (_) => overlayEntry.remove(),
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Icons.search_outlined),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            textController.text = '';
+                            _updateFilter('');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).viewInsets.bottom,
+                ),
+              ],
             ),
-            SizedBox(
-              height: MediaQuery.of(context).viewInsets.bottom,
-            ),
-          ],
-        ),
-      );
-    }, opaque: false);
+          );
+        },
+        opaque: false);
     Overlay.of(context)?.insert(overlayEntry);
+  }
+
+  void _updateFilter(String newFilter) {
+    setState(() {
+      filter = newFilter;
+    });
+    store.loadDocuments(newFilter);
   }
 
   Widget _documentsGrid(List<Document> documents) => DocumentsGrid(

@@ -11,7 +11,6 @@ class ListDocumentsStore extends NotifierStore<Failure, List<Document>> {
 
   Future<void> loadDocuments([String? name]) async {
     executeEither(() async {
-      print('searching');
       return MyEitherAdapter(await usecase(DocumentFilter(name: name)));
     }, delay: Duration(milliseconds: 300));
   }

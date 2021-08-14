@@ -26,11 +26,17 @@ dependencies:
   flutter_triple: ^1.2.3+1
   path_provider: ^2.0.2
   share: ^2.0.4
+  badges: ^2.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   mocktail: ^0.1.4
+  flutter_launcher_icons: ^0.9.1
+
+flutter_icons:
+  android: 'launcher_icon'
+  image_path: 'assets/icon/ic_launcher.png'
 
 flutter:
   uses-material-design: true
