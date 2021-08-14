@@ -12,7 +12,7 @@ class ListDocumentsStore extends NotifierStore<Failure, List<Document>> {
   Future<void> loadDocuments([String? name]) async {
     executeEither(() async {
       return MyEitherAdapter(await usecase(DocumentFilter(name: name)));
-    }, delay: Duration(milliseconds: 300));
+    }, delay: Duration(milliseconds: name != null ? 300 : 0));
   }
 }
 
@@ -25,5 +25,4 @@ class MyEitherAdapter<Left, Right> extends EitherAdapter<Left, Right> {
   fold(Function(Left l) leftF, Function(Right l) rightF) {
     return either.fold(leftF, rightF);
   }
-
 }

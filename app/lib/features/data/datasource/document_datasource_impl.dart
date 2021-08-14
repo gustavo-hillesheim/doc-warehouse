@@ -109,7 +109,11 @@ class DocumentDataSourceImpl extends DocumentDataSource {
       final result =
           await database.query("SELECT seq + 1 as nextId FROM sqlite_sequence where "
               "name='documents'");
-      return result.data.first['nextId'] ?? 1;
+      if (result.data.isNotEmpty) {
+        return result.data.first['nextId'];
+      } else {
+        return 1;
+      }
     } on Exception catch (e) {
       throw DatabaseException("Could not query next id", e);
     }

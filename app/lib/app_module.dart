@@ -18,6 +18,7 @@ import 'package:doc_warehouse/features/presenter/controller/list_documents_store
 import 'package:doc_warehouse/features/presenter/pages/create_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/list_documents_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/save_shared_document_page.dart';
+import 'package:doc_warehouse/features/presenter/pages/splash_screen_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/update_document_page.dart';
 import 'package:doc_warehouse/features/presenter/pages/view_document_page.dart';
 import 'package:doc_warehouse/routes.dart';
@@ -44,6 +45,10 @@ class AppModule extends Module {
 
   @override
   final List<ModularRoute> routes = [
+    ChildRoute(
+      Routes.splashScreen,
+      child: (_, __) => SplashScreenPage(),
+    ),
     ChildRoute(
       Routes.listDocuments,
       child: (_, __) => ListDocumentsPage(),

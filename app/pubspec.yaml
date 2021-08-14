@@ -33,10 +33,19 @@ dev_dependencies:
     sdk: flutter
   mocktail: ^0.1.4
   flutter_launcher_icons: ^0.9.1
+  flutter_native_splash: ^1.2.1
 
 flutter_icons:
   android: 'launcher_icon'
   image_path: 'assets/icon/ic_launcher.png'
+  adaptive_icon_background: '#607d8b'
+  adaptive_icon_foreground: 'assets/icon/adaptive_ic_launcher.png'
+
+flutter_native_splash:
+  color: '#607d8b'
+  image: 'assets/splash_screen/splash_image_gradient.png'
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/splash_screen/splash_image_gradient.png

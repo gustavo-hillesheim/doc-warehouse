@@ -4,7 +4,8 @@ class Routes {
 
   Routes._();
 
-  static final listDocuments = Modular.initialRoute;
+  static final splashScreen = Modular.initialRoute;
+  static final listDocuments = '/listDocuments';
   static final createDocument = '/createDocument';
   static final editDocument = '/editDocument';
   static final viewDocument = '/viewDocument';

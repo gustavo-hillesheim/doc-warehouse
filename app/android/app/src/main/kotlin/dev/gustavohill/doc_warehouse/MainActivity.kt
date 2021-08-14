@@ -1,8 +1,14 @@
 package dev.gustavohill.doc_warehouse
 
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.Build
+import android.widget.ImageView
+import io.flutter.embedding.android.DrawableSplashScreen
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.SplashScreen
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
@@ -13,6 +19,27 @@ class MainActivity() : FlutterActivity(), MethodChannel.MethodCallHandler, Event
     private val METHOD_CHANNEL = "gustavohill.shareIntentReceiver/method_channel"
     private val EVENT_CHANNEL = "gustavohill.shareIntentReceiver/event_channel"
     private var eventSink: EventChannel.EventSink? = null
+
+    override fun provideSplashScreen(): SplashScreen? {
+        val manifestSplashDrawable = getSplashScreenFromManifest();
+        return DrawableSplashScreen(
+                manifestSplashDrawable,
+                ImageView.ScaleType.FIT_XY,
+                0 // Fade in duration
+        );
+    }
+
+    // Copied from FlutterActivity since it's private
+    private fun getSplashScreenFromManifest(): Drawable {
+        val activityInfo = getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA)
+        val metadata = activityInfo.metaData
+        val splashScreenId = metadata.getInt("io.flutter.embedding.android.SplashScreenDrawable")
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+            return getResources().getDrawable(splashScreenId, getTheme())
+        } else {
+            return getResources().getDrawable(splashScreenId)
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

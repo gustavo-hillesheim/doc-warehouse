@@ -1,3 +1,4 @@
+import 'package:doc_warehouse/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -7,12 +8,15 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Colors.blueGrey;
     return MaterialApp(
-      initialRoute: '/',
+      initialRoute: Routes.splashScreen,
       theme: ThemeData(
         primarySwatch: primaryColor,
         backgroundColor: Colors.white,
         scaffoldBackgroundColor: Colors.white,
         inputDecorationTheme: _inputDecorationTheme(primaryColor),
+      ),
+      home: Center(
+        child: Text('This is the splash screen'),
       ),
     ).modular();
   }
